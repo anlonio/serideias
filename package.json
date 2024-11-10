@@ -1,0 +1,25 @@
+{
+  "name": "serideias",
+  "description": "A social impact project builded with Nuxt",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": {
+    "name": "Anlonio",
+    "email": "antonio.machado.dev@gmail.com",
+    "url": "https://github.com/Anlonio"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@nuxt/ui": "^2.19.2",
+    "nuxt": "^3.14.159"
+  }
+}
