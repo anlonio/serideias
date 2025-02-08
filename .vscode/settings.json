@@ -3,5 +3,9 @@
     "conventionalCommits.scopes": [
         "pages",
         "setup"
-    ]
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always"
+    }
 }

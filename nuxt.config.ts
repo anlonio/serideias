@@ -8,20 +8,21 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
   modules: [
+    'nuxt-zod-i18n',
+    '@nuxtjs/i18n',
+    '@nuxt/eslint',
+    '@nuxtjs/supabase',
+    '@prisma/nuxt',
     '@vueuse/nuxt',
     '@vite-pwa/nuxt',
     '@nuxtjs/color-mode',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
-        // @ts-expect-error
+        // @ts-expect-error plugins is possibly undefined
         config.plugins.push(vuetify({ autoImport: true }))
       })
     },
   ],
-  pwa: {
-    /* PWA options */
-
-  },
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
     fallback: 'light', // fallback value if not system preference found
@@ -40,4 +41,14 @@ export default defineNuxtConfig({
       },
     },
   },
+  i18n: {
+    vueI18n: './i18n.config.ts'
+  },
+  supabase: {
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      exclude: ['/', '/api/*']
+    }
+  }
 })

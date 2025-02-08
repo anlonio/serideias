@@ -18,20 +18,27 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@eslint/js": "^9.15.0",
+    "@eslint/js": "^9.19.0",
     "@nuxt/devtools": "latest",
+    "@nuxt/eslint": "^1.0.0",
     "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/i18n": "^9.2.0",
+    "@nuxtjs/supabase": "^1.4.6",
+    "@prisma/client": "^6.3.0",
+    "@prisma/nuxt": "^0.3.0",
     "@vite-pwa/nuxt": "^0.10.6",
-    "@vueuse/core": "^11.2.0",
-    "@vueuse/nuxt": "^11.2.0",
-    "eslint": "^9.15.0",
-    "eslint-plugin-vue": "^9.31.0",
-    "globals": "^15.12.0",
-    "nuxt": "^3.14.159",
-    "prettier": "3.3.3",
-    "typescript-eslint": "^8.14.0",
+    "@vueuse/core": "^12.5.0",
+    "@vueuse/nuxt": "^12.5.0",
+    "eslint": "^9.19.0",
+    "eslint-plugin-vue": "^9.32.0",
+    "globals": "^15.14.0",
+    "nuxt": "^3.15.4",
+    "nuxt-zod-i18n": "^1.11.5",
+    "prettier": "^3.4.2",
+    "prisma": "^6.3.0",
+    "typescript-eslint": "^8.22.0",
     "vite-plugin-vuetify": "^2.0.4",
-    "vuetify": "^3.7.4"
+    "vuetify": "^3.7.9"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47"
