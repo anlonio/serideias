@@ -7,6 +7,14 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
+  imports: {
+    presets: [
+      { 
+        from: 'zod',
+        imports: ['z']
+      }
+    ]
+  },
   modules: [
     'nuxt-zod-i18n',
     '@nuxtjs/i18n',
@@ -42,7 +50,9 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
-    vueI18n: './i18n.config.ts'
+    defaultLocale: 'pt-BR',
+    locales: [{code: 'pt-BR', file: 'pt-BR.json'}],
+    lazy: true
   },
   supabase: {
     redirectOptions: {
