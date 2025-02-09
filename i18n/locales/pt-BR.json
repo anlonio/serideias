@@ -2,6 +2,7 @@
   "zodI18n": {
     "errors": {
       "custom": "Entrada inválida",
+      "passwords_dont_match": "Senhas não são equivalentes",
       "invalid_arguments": "Argumentos de função inválidos",
       "invalid_date": "Data inválida",
       "invalid_enum_value": "Valor de enum inválido. Esperava-se que {options} fosse revisto, mas recebeu '{received}'",
@@ -9,14 +10,14 @@
       "invalid_literal": "Valor literal inválido, esperado {expected}",
       "invalid_return_type": "Tipo de retorno de função inválido",
       "invalid_string": {
-        "cuid": "Inválido {validation}",
-        "datetime": "Inválido {validation}",
-        "email": "Inválido {validation}",
+        "cuid": "{validation} Inválido",
+        "datetime": "{validation} Inválido",
+        "email": "{validation} Inválido",
         "endsWith": "Entrada inválida: deve terminar com \"{endsWith}\"",
         "regex": "Inválido",
         "startsWith": "Entrada inválida: deve começar por \"{startsWith}\"",
-        "url": "Inválido {validation}",
-        "uuid": "Inválido {validation}"
+        "url": "{validation} Inválido",
+        "uuid": "{validation} Inválido"
       },
       "invalid_type": "Esperado {expected}, recebido {received}",
       "invalid_type_received_undefined": "Necessário",
@@ -47,9 +48,9 @@
           "not_inclusive": "Entrada inválida"
         },
         "string": {
-          "exact": "A cadeia de caracteres deve conter exatamente {maximum} carácter(es)",
-          "inclusive": "A cadeia de caracteres deve conter no máximo {maximum} carácter(es)",
-          "not_inclusive": "A cadeia de caracteres deve conter menos de {maximum} carácter(es)"
+          "exact": "Esse campo deve conter exatamente {maximum} caracteres",
+          "inclusive": "Máximo de {maximum} caracteres",
+          "not_inclusive": "Esse campo deve conter menos de {maximum} caracteres"
         }
       },
       "too_small": {
@@ -74,9 +75,9 @@
           "not_inclusive": "Entrada inválida"
         },
         "string": {
-          "exact": "A cadeia de caracteres deve conter exatamente {minimum} carácter(es)",
-          "inclusive": "A cadeia de caracteres deve conter pelo menos {minimum} carácter(es)",
-          "not_inclusive": "A cadeia de caracteres deve conter mais de {minimum} carácter(es)"
+          "exact": "Esse campo deve conter exatamente {maximum} caracteres",
+          "inclusive": "Mínimo de {minimum} caracteres",
+          "not_inclusive": "Esse campo deve conter mais de {minimum} caracteres"
         }
       },
       "unrecognized_keys": "Chave(s) não reconhecida(s) no objeto: {keys} para rever"
@@ -106,10 +107,11 @@
     "validations": {
       "cuid": "cuidado",
       "datetime": "Data/hora",
-      "email": "Correio eletrónico",
+      "email": "email",
       "regex": "regex",
       "url": "URL",
       "uuid": "uuid"
     }
   }
 }
+

@@ -2,14 +2,15 @@
   <VResponsive>
     <VApp>
       <VAppBar>
-        <template v-slot:prepend>
-          <v-app-bar-nav-icon></v-app-bar-nav-icon>
+        <template #prepend>
+          <v-app-bar-nav-icon />
         </template>
         <VAppBarTitle>{{ $route.meta.title }}</VAppBarTitle>
-        <template v-slot:append>
-          <v-btn icon="mdi-magnify"></v-btn>
-          <v-btn icon="mdi-theme-light-dark" @click="toggleTheme"></v-btn>
-          <v-btn icon="mdi-dots-vertical"></v-btn>
+        <template #append>
+          <v-btn icon="mdi-magnify" />
+          <v-btn icon="mdi-theme-light-dark" @click="toggleTheme" />
+          <VBtn variant="outlined" color="info" to="/login">fazer login</VBtn>
+          <v-btn icon="mdi-dots-vertical" />
         </template>
       </VAppBar>
       <slot />
@@ -22,7 +23,7 @@
 
 <script setup lang="ts">
 import { useTheme } from 'vuetify'
-import { VResponsive } from 'vuetify/components'
+import { VBtn, VResponsive } from 'vuetify/components'
 
 const theme = useTheme()
 const mode = useColorMode()

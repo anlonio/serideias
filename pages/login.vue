@@ -9,30 +9,29 @@
                 <h1>Fazer Login</h1>
                 <VRow align="center" class="pt-4">
                   <VCol class="text-end">
-                    <VTextField v-model="email" label="Email" type="email" />
-                    <VTextField v-model="phone" label="Telefone" type="tel" />
                     <VTextField
-                      v-model="password"
+                      v-model="email.value.value"
+                      :error-messages="email.errors.value"
+                      label="Email"
+                      type="email"
+                    />
+                    <VTextField
+                      v-model="password.value.value"
+                      :error-messages="password.errors.value"
                       label="Senha"
                       type="password"
                     />
-                    <VTextField
-                      v-if="createAccount"
-                      v-model="confirmPassword"
-                      label="Confirme a Senha"
-                      type="password"
-                    />
-                    <VRow>
+                    <VRow class="pt-4">
                       <VBtn class="mr-4" variant="text">Esqueci a senha</VBtn>
                       <VSpacer />
                       <VBtn
                         color="info"
                         class="mr-4"
                         variant="text"
-                        @click="createAccount = !createAccount"
-                        >{{ toggleAction }}</VBtn
+                        to="/register"
+                        >Criar conta</VBtn
                       >
-                      <VBtn color="success" type="submit">{{ action }}</VBtn>
+                      <VBtn color="success" type="submit">Cadastrar</VBtn>
                     </VRow>
                   </VCol>
                 </VRow>
@@ -46,54 +45,36 @@
 </template>
 
 <script lang="ts" setup>
+import { toTypedSchema } from '@vee-validate/zod'
 definePageMeta({
   layout: 'auth',
 })
-const supabase = useSupabaseClient()
 
-const user = useSupabaseUser()
-supabase.auth.onAuthStateChange(() => {
-  console.log('user: ', user.value)
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(
+    z.object({
+      email: z.string().email(),
+      password: z.string(),
+    }),
+  ),
 })
 
-const action = computed(() => (createAccount.value ? 'Criar conta' : 'Entrar'))
-const toggleAction = computed(() =>
-  createAccount.value ? 'Fazer login' : 'Criar conta',
-)
+const email = useField('email')
+const password = useField('password')
 
-const createAccount = ref(false)
-const email = ref('')
-const phone = ref('')
-const password = ref('')
-const confirmPassword = ref('')
+const onSubmit = handleSubmit((value) => {
+  console.log(value)
+})
 
-const onSubmit = () => {
-  if (createAccount.value) {
-    return signUp()
-  }
+// const signInWithPassword = async () => {
+//   if (!email.value) return
 
-  return signInWithPassword()
-}
-
-const signUp = async () => {
-  if (password.value !== confirmPassword.value) return
-  const { error } = await supabase.auth.signUp({
-    email: email.value,
-    phone: phone.value,
-    password: password.value,
-  })
-  if (error) console.log(error)
-}
-const signInWithPassword = async () => {
-  if (!email.value && !phone.value) return
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email: email.value,
-    phone: phone.value,
-    password: password.value,
-  })
-  if (error) console.log(error)
-}
+//   const { error } = await supabase.auth.signInWithPassword({
+//     email: email.value,
+//     password: password.value,
+//   })
+//   if (error) console.log(error)
+// }
 </script>
 
 <style></style>

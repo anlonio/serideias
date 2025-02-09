@@ -16,11 +16,11 @@ export default defineNuxtConfig({
     ]
   },
   modules: [
+    '@vee-validate/nuxt',
     'nuxt-zod-i18n',
     '@nuxtjs/i18n',
     '@nuxt/eslint',
     '@nuxtjs/supabase',
-    '@prisma/nuxt',
     '@vueuse/nuxt',
     '@vite-pwa/nuxt',
     '@nuxtjs/color-mode',
@@ -58,7 +58,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      exclude: ['/', '/api/*']
+      exclude: ['/', '/register' , '/api/*']
     }
   }
 })
