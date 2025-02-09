@@ -64,33 +64,8 @@ definePageMeta({
   layout: 'auth',
 })
 
-const { t } = useI18n()
-
 const { handleSubmit } = useForm({
-  validationSchema: toTypedSchema(
-    z.object({
-      email: z.string().email(),
-      password: z
-        .object({
-          password: z.string().min(6).max(32),
-          confirmPassword: z.string().min(6).max(32),
-        })
-        .superRefine(({ password, confirmPassword }, ctx) => {
-          if (confirmPassword !== password) {
-            ctx.addIssue({
-              code: 'custom',
-              message: t('zodI18n.errors.passwords_dont_match'),
-              path: ['confirmPassword'],
-            })
-          }
-        })
-        .transform(({ password }) => {
-          return password
-        }),
-      username: z.string().min(4).max(32),
-      fullName: z.string().min(4).max(200),
-    }),
-  ),
+  validationSchema: toTypedSchema(signUpUserSchema),
 })
 
 const email = useField('email')
@@ -100,20 +75,11 @@ const confirmPassword = useField('password.confirmPassword')
 const username = useField('username')
 const fullName = useField('fullName')
 
-const supabase = useSupabaseClient()
+const authStore = useAuthStore()
 
 const onSubmit = handleSubmit(async (data) => {
-  const { error } = await supabase.auth.signUp({
-    email: data.email,
-    options: {
-      data: {
-        username: data.username,
-        full_name: data.fullName,
-      },
-    },
-    password: data.password,
-  })
-  if (error) console.log(error)
+  const result = await useAsyncData('signUp', () => authStore.signUp(data))
+  console.log(result)
 })
 </script>
 

@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
   imports: {
+    dirs: ['stores', '@types'],
     presets: [
       { 
         from: 'zod',
@@ -16,6 +17,7 @@ export default defineNuxtConfig({
     ]
   },
   modules: [
+    '@pinia/nuxt',
     '@vee-validate/nuxt',
     'nuxt-zod-i18n',
     '@nuxtjs/i18n',

@@ -31,7 +31,7 @@
                         to="/register"
                         >Criar conta</VBtn
                       >
-                      <VBtn color="success" type="submit">Cadastrar</VBtn>
+                      <VBtn color="success" type="submit">Entrar</VBtn>
                     </VRow>
                   </VCol>
                 </VRow>
@@ -51,30 +51,18 @@ definePageMeta({
 })
 
 const { handleSubmit } = useForm({
-  validationSchema: toTypedSchema(
-    z.object({
-      email: z.string().email(),
-      password: z.string(),
-    }),
-  ),
+  validationSchema: toTypedSchema(signInUserSchema),
 })
 
 const email = useField('email')
 const password = useField('password')
 
-const onSubmit = handleSubmit((value) => {
-  console.log(value)
+const authStore = useAuthStore()
+
+const onSubmit = handleSubmit(async (data) => {
+  const result = await useAsyncData('signIn', () => authStore.signIn(data))
+  console.log(result)
 })
-
-// const signInWithPassword = async () => {
-//   if (!email.value) return
-
-//   const { error } = await supabase.auth.signInWithPassword({
-//     email: email.value,
-//     password: password.value,
-//   })
-//   if (error) console.log(error)
-// }
 </script>
 
 <style></style>

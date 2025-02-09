@@ -9,7 +9,9 @@
         <template #append>
           <v-btn icon="mdi-magnify" />
           <v-btn icon="mdi-theme-light-dark" @click="toggleTheme" />
-          <VBtn variant="outlined" color="info" to="/login">fazer login</VBtn>
+          <VBtn v-if="isAnon" variant="outlined" color="info" to="/login"
+            >fazer login</VBtn
+          >
           <v-btn icon="mdi-dots-vertical" />
         </template>
       </VAppBar>
@@ -23,7 +25,8 @@
 
 <script setup lang="ts">
 import { useTheme } from 'vuetify'
-import { VBtn, VResponsive } from 'vuetify/components'
+
+const { isAnon } = useAuthStore()
 
 const theme = useTheme()
 const mode = useColorMode()
