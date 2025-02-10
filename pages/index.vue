@@ -1,9 +1,16 @@
 <template>
   <VMain>
     <VContainer>
-      <VRow v-for="n in 10" :key="n" justify="center">
+      <VRow justify="center">
         <VCol sm="12" md="10" lg="4" xl="5">
-          <PostItem />
+          <VBtn variant="outlined" color="success" block to="/posts/new">
+            Nova publicação
+          </VBtn>
+        </VCol>
+      </VRow>
+      <VRow v-for="post in posts" :key="post.uuid" justify="center">
+        <VCol sm="12" md="10" lg="4" xl="5">
+          <PostItem :post="post" />
         </VCol>
       </VRow>
     </VContainer>
@@ -15,6 +22,11 @@ definePageMeta({
   title: 'Serideias',
   name: 'posts',
 })
+
+const postStore = usePostStore()
+const { posts } = storeToRefs(postStore)
+
+postStore.fetchPosts()
 </script>
 
 <style></style>

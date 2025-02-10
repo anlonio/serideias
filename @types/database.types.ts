@@ -53,7 +53,7 @@ export type Database = {
         Insert: {
           id?: number
           name: string
-          uuid: string
+          uuid?: string
         }
         Update: {
           id?: number
@@ -83,7 +83,7 @@ export type Database = {
           location_id?: number | null
           title: string
           updated_at?: string | null
-          uuid: string
+          uuid?: string
         }
         Update: {
           author_id?: string
@@ -118,7 +118,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           education: string | null
-          full_name: string | null
+          full_name: string
           id: string
           occupation: string | null
           updated_at: string | null
@@ -130,7 +130,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           education?: string | null
-          full_name?: string | null
+          full_name: string
           id: string
           occupation?: string | null
           updated_at?: string | null
@@ -142,7 +142,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           education?: string | null
-          full_name?: string | null
+          full_name?: string
           id?: string
           occupation?: string | null
           updated_at?: string | null
@@ -203,6 +203,42 @@ export type Database = {
             columns: ["reply_id"]
             isOneToOne: false
             referencedRelation: "replies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      votes: {
+        Row: {
+          id: number
+          is_upvote: boolean
+          post_id: number | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: number
+          is_upvote: boolean
+          post_id?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: number
+          is_upvote?: boolean
+          post_id?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

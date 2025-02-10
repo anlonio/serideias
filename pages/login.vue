@@ -58,6 +58,17 @@ const email = useField('email')
 const password = useField('password')
 
 const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
+
+const router = useRouter()
+watch(
+  () => user.value,
+  (value) => {
+    if (value) {
+      router.push('/')
+    }
+  },
+)
 
 const onSubmit = handleSubmit(async (data) => {
   const result = await useAsyncData('signIn', () => authStore.signIn(data))

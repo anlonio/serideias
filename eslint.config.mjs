@@ -1,6 +1,8 @@
 import withNuxt from './.nuxt/eslint.config.mjs'
 
-export default withNuxt()
+export default withNuxt({
+  files: ['**/*.ts', '**/*.vue'],
+})
 // your custom flat configs go here, for example:
 // {
 //   files: ['**/*.ts', '**/*.tsx'],
@@ -11,3 +13,4 @@ export default withNuxt()
 // {
 //   ...
 // }
+
