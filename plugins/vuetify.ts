@@ -8,6 +8,9 @@ import colors from 'vuetify/util/colors'
 
 export default defineNuxtPlugin((app) => {
   const vuetify = createVuetify({
+    locale: {
+      locale: 'pt-BR',
+    },
     ssr: true,
     theme: {
       themes: {
@@ -16,17 +19,18 @@ export default defineNuxtPlugin((app) => {
           colors: {
             primary: colors.deepOrange.base,
             secondary: colors.amber.base,
-          }
+          },
         },
         light: {
           dark: false,
           colors: {
             primary: colors.orange.base,
             secondary: colors.brown.base,
-          }
+          },
         },
       },
     },
   })
   app.vueApp.use(vuetify)
 })
+

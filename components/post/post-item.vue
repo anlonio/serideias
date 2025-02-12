@@ -1,25 +1,29 @@
 <template>
-  <v-card class="mx-auto" hover variant="outlined">
+  <v-card
+    class="mx-auto"
+    hover
+    variant="outlined"
+    :to="{ path: `/posts/${post.uuid}` }"
+  >
     <VCardTitle>{{ post.title }}</VCardTitle>
-    <VCardSubtitle> {{ post.created_at }} </VCardSubtitle>
+    <VCardSubtitle> {{ createdAt }} </VCardSubtitle>
     <VCardText>
       <p>
         {{ post.content }}
       </p>
       <VChipGroup>
         <VChip
-          v-for="keyword in post.keywords?.slice(0, 5)"
+          v-if="post.location"
+          variant="outlined"
+          prepend-icon="mdi-map-marker"
+          >{{ post.location.name }}</VChip
+        >
+        <VChip
+          v-for="keyword in post.keywords"
           :key="keyword"
           variant="outlined"
         >
           {{ keyword }}
-        </VChip>
-        <VChip
-          v-if="keywordsSize > 5"
-          v-tooltip="extraKeywords"
-          variant="outlined"
-        >
-          +{{ keywordsSize - 5 }}
         </VChip>
       </VChipGroup>
     </VCardText>
@@ -51,6 +55,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useDate } from 'vuetify'
+
 const { post } = defineProps<{ post: PostsRowFull }>()
 
 const postStore = usePostStore()
@@ -66,14 +72,13 @@ const getVotes = async () => {
   downVote.value = result.downVote
 }
 
+getVotes()
+
 const getVotesIcon = computed(() => {
   return totalVotes.value >= 0 ? 'mdi-arrow-up-bold' : 'mdi-arrow-down-bold'
 })
 
-getVotes()
-
-const keywordsSize = computed(() => post.keywords?.length ?? 0)
-const extraKeywords = computed(() => post.keywords?.slice(5).join(', '))
+const createdAt = useDate().format(post.created_at, 'keyboardDateTime')
 </script>
 
 <style></style>

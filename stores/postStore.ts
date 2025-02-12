@@ -1,7 +1,8 @@
 export const usePostStore = defineStore('post', () => {
-  const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient<Database>()
 
   const posts = ref<PostsRowFull[]>([])
+  const post = ref<PostsRowFullWithReplies | null>(null)
 
   const fetchPosts = async () => {
     const result = await supabase
@@ -10,14 +11,38 @@ export const usePostStore = defineStore('post', () => {
         `
         *,
         author:profiles(*),
-        totalReplies:replies(count)
+        totalReplies:replies(count),
+        location:locations(*)
       `,
       )
+      .order('created_at', { ascending: false })
       .limit(20)
-      .returns<PostsRowFull[]>()
 
     if (result.data) {
       posts.value = result.data
+    }
+  }
+
+  const fetchPost = async (uuid: string) => {
+    const result = await supabase
+      .from('posts')
+      .select(
+        `
+        *,
+        author:profiles(*),
+        totalReplies:replies(count),
+        replies(
+          *,
+          author:profiles(*) 
+        ),
+        location:locations(*)
+      `,
+      )
+      .eq('uuid', uuid)
+      .maybeSingle()
+
+    if (result.data) {
+      post.value = result.data
     }
   }
 
@@ -42,6 +67,13 @@ export const usePostStore = defineStore('post', () => {
     }
   }
 
+  const createPost = async (post: NewPost) => {
+    const { error } = await supabase.from('posts').insert(post)
+    if (error) {
+      throw error
+    }
+  }
+
   const locations = ref<LocationsRow[]>([])
 
   const fetchLocations = () => {
@@ -56,6 +88,15 @@ export const usePostStore = defineStore('post', () => {
     })
   }
 
-  return { posts, fetchPosts, fetchVotes, fetchLocations, locations }
+  return {
+    posts,
+    post,
+    fetchPosts,
+    fetchPost,
+    fetchVotes,
+    fetchLocations,
+    createPost,
+    locations,
+  }
 })
 

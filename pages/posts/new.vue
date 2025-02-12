@@ -1,18 +1,25 @@
 <template>
   <VMain class="mt-4">
-    <VForm>
+    <VForm @submit.prevent="onSubmit">
       <h1 class="text-center">Nova Publicação</h1>
       <VContainer>
         <VRow justify="center">
           <VCol sm="12" md="10" lg="4" xl="5">
             <VRow>
               <VCol>
-                <VTextField label="Título" variant="outlined" />
+                <VTextField
+                  v-model="title.value.value"
+                  :error-messages="title.errors.value"
+                  label="Título"
+                  variant="outlined"
+                />
               </VCol>
             </VRow>
             <VRow>
               <VCol>
                 <VTextarea
+                  v-model="content.value.value"
+                  :error-messages="content.errors.value"
                   variant="outlined"
                   label="Conteúdo"
                   placeholder="Escreva sua ideia aqui..."
@@ -22,6 +29,8 @@
             <VRow>
               <VCol>
                 <VCombobox
+                  v-model="keywords.value.value"
+                  :error-messages="keywords.errors.value"
                   multiple
                   label="palavras-chave"
                   chips
@@ -39,7 +48,8 @@
             <VRow>
               <VCol>
                 <VAutocomplete
-                  v-model="location"
+                  v-model="location.value.value"
+                  :error-messages="location.errors.value"
                   variant="outlined"
                   :items="locations"
                   item-title="name"
@@ -49,11 +59,14 @@
             </VRow>
             <VRow>
               <VCol>
-                <VBtn color="success" block>Criar Publicação</VBtn>
+                <VBtn color="success" type="submit" block :loading="loading"
+                  >Criar Publicação</VBtn
+                >
               </VCol>
             </VRow>
           </VCol>
         </VRow>
+        {{ values }}
       </VContainer>
     </VForm>
   </VMain>
@@ -68,7 +81,25 @@ const postStore = usePostStore()
 await postStore.fetchLocations()
 const { locations } = storeToRefs(postStore)
 
-const location = ref(null)
+const { handleSubmit, values } = useForm<NewPost>({
+  validationSchema: toTypedSchema(newPostSchema),
+})
+
+const title = useField('title')
+const content = useField('content')
+const keywords = useField<string[]>('keywords')
+const location = useField('location_id')
+
+const loading = ref(false)
+
+const router = useRouter()
+
+const onSubmit = handleSubmit(async (post) => {
+  loading.value = true
+  await postStore.createPost(post)
+  loading.value = false
+  router.push('/')
+})
 </script>
 
 <style></style>
