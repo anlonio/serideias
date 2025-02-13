@@ -4,13 +4,25 @@ export const usePostStore = defineStore('post', () => {
   const posts = ref<PostsRowFull[]>([])
   const post = ref<PostsRowFullWithReplies | null>(null)
 
+  const rootReplies = computed(() => {
+    return post.value?.replies.filter((reply) => !reply.reply_id)
+  })
+
+  const nestedReplies = computed(() => {
+    return (parentReply: RepliesRow) =>
+      post.value?.replies.filter((reply) => reply.reply_id === parentReply.id)
+  })
+
   const fetchPosts = async () => {
     const result = await supabase
       .from('posts')
       .select(
         `
         *,
-        author:profiles(*),
+        author:profiles(
+          *,
+          location: locations(*)
+        ),
         totalReplies:replies(count),
         location:locations(*)
       `,
@@ -29,11 +41,17 @@ export const usePostStore = defineStore('post', () => {
       .select(
         `
         *,
-        author:profiles(*),
+        author:profiles(
+          *,
+          location: locations(*)
+        ),
         totalReplies:replies(count),
         replies(
           *,
-          author:profiles(*) 
+          author:profiles(
+            *,
+            location: locations(*)
+          ) 
         ),
         location:locations(*)
       `,
@@ -91,6 +109,8 @@ export const usePostStore = defineStore('post', () => {
   return {
     posts,
     post,
+    rootReplies,
+    nestedReplies,
     fetchPosts,
     fetchPost,
     fetchVotes,

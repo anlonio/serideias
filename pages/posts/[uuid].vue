@@ -2,28 +2,16 @@
   <VMain>
     <VContainer v-if="post">
       <VRow justify="center">
-        <VCol sm="12" md="10" lg="4" xl="5">
-          <VRow justify="center">
-            <VCol class="text-center">
-              <h1>{{ post.title }}</h1>
+        <VCol sm="12" md="10" lg="8" xl="5">
+          <VRow justify="center" class="pt-4">
+            <VCol>
+              <h1 class="text-h2 font-weight-bold">{{ post.title }}</h1>
             </VCol>
           </VRow>
           <VRow>
             <VCol>
-              <VListItem
-                :title="post.author.full_name"
-                :subtitle="`@${post.author.username}`"
-              >
-                <template #prepend>
-                  <VIcon
-                    v-if="!post.author.avatar_url"
-                    icon="mdi-account-circle"
-                    size="48"
-                  />
-                  <VAvatar v-else :image="post.author.avatar_url ?? ''" />
-                </template>
+              <ProfileItem :author="post.author" :created-at="post.created_at">
                 <template #append>
-                  <span>{{ createdAt }}</span>
                   <VBtn
                     variant="plain"
                     density="compact"
@@ -36,12 +24,32 @@
                     icon="mdi-arrow-down-bold"
                   />
                 </template>
-              </VListItem>
+              </ProfileItem>
             </VCol>
           </VRow>
           <VRow>
-            <VCol>
+            <VDivider />
+          </VRow>
+          <VRow>
+            <VCol class="py-4">
               <p>{{ post.content }}</p>
+              <br />
+              <span class="text-caption font-weight-bold">Palavras-chave:</span>
+              <VChipGroup>
+                <VChip
+                  v-if="post.location"
+                  variant="outlined"
+                  prepend-icon="mdi-map-marker"
+                  >{{ post.location.name }}</VChip
+                >
+                <VChip
+                  v-for="keyword in post.keywords"
+                  :key="keyword"
+                  variant="outlined"
+                >
+                  {{ keyword }}
+                </VChip>
+              </VChipGroup>
             </VCol>
           </VRow>
           <VRow>
@@ -66,38 +74,66 @@
           <VRow>
             <VDivider />
           </VRow>
-          <VRow v-for="reply in post.replies" :key="reply.uuid">
+          <VRow v-for="reply in rootReplies" :key="reply.uuid">
             <VCol>
-              <VCard
-                variant="flat"
-                :title="reply.author.full_name"
-                :subtitle="`@${reply.author.username}`"
-                :text="reply.content"
+              <VRow>
+                <VCol class="pa-0 ma-0">
+                  <VCard variant="flat" :text="reply.content">
+                    <template #title>
+                      <ProfileItem
+                        :author="reply.author"
+                        :created-at="reply.created_at"
+                      />
+                    </template>
+                    <template #actions>
+                      <VBtn
+                        variant="plain"
+                        density="compact"
+                        icon="mdi-arrow-up-bold"
+                      />
+                      <span>{{ totalVotes }}</span>
+                      <VBtn
+                        variant="plain"
+                        density="compact"
+                        icon="mdi-arrow-down-bold"
+                      />
+                    </template>
+                  </VCard>
+                </VCol>
+              </VRow>
+              <VRow
+                v-for="nestedReply in nestedReplies(reply)"
+                :key="nestedReply.uuid"
               >
-                <template #prepend>
-                  <VIcon
-                    v-if="!post.author.avatar_url"
-                    icon="mdi-account-circle"
-                    size="48"
-                  />
-                  <VAvatar v-else :image="post.author.avatar_url ?? ''" />
-                </template>
-                <template #actions>
-                  <VBtn
-                    variant="plain"
-                    density="compact"
-                    icon="mdi-arrow-up-bold"
-                  />
-                  <span>{{ totalVotes }}</span>
-                  <VBtn
-                    variant="plain"
-                    density="compact"
-                    icon="mdi-arrow-down-bold"
-                  />
-                </template>
-              </VCard>
-              <VDivider />
+                <VCol cols="1" class="text-center pa-0 ma-0">
+                  <VDivider inset vertical length="100%" thickness="2" />
+                </VCol>
+                <VCol>
+                  <VCard variant="flat" :text="nestedReply.content">
+                    <template #title>
+                      <ProfileItem
+                        :author="nestedReply.author"
+                        :created-at="nestedReply.created_at"
+                      />
+                    </template>
+                    <template #actions>
+                      <VBtn
+                        variant="plain"
+                        density="compact"
+                        icon="mdi-arrow-up-bold"
+                      />
+                      <span>{{ totalVotes }}</span>
+                      <VBtn
+                        variant="plain"
+                        density="compact"
+                        icon="mdi-arrow-down-bold"
+                      />
+                    </template>
+                  </VCard>
+                </VCol>
+              </VRow>
             </VCol>
+            <VDivider />
           </VRow>
         </VCol>
       </VRow>
@@ -106,15 +142,13 @@
 </template>
 
 <script lang="ts" setup>
-import { useDate } from 'vuetify'
-
 definePageMeta({
   props: true,
 })
 const { uuid } = defineProps<{ uuid: string }>()
 
 const postStore = usePostStore()
-const { post } = storeToRefs(postStore)
+const { post, rootReplies, nestedReplies } = storeToRefs(postStore)
 const upVote = ref<number | null>(null)
 const downVote = ref<number | null>(null)
 const totalVotes = computed(() => {
@@ -132,8 +166,6 @@ watchEffect(() => {
     getVotes(post.value)
   }
 })
-
-const createdAt = useDate().format(post.value?.created_at, 'keyboardDateTime')
 
 postStore.fetchPost(uuid)
 </script>

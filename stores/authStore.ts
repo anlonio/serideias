@@ -9,12 +9,18 @@ export const useAuthStore = defineStore('auth', () => {
   const fetchProfile = (id: string) =>
     supabase
       .from('profiles')
-      .select()
+      .select(
+        `
+        *,
+        location:locations(*)
+        `,
+      )
       .eq('id', id)
       .returns<ProfilesRow>()
       .maybeSingle()
       .then((profileDB) => {
         profile.value = profileDB.data
+        return profileDB.data
       })
 
   watchEffect(() => {

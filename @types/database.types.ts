@@ -66,34 +66,34 @@ export type Database = {
         Row: {
           author_id: string
           content: string
-          created_at: string | null
+          created_at: string
           id: number
           keywords: string[] | null
           location_id: number | null
           title: string
-          updated_at: string | null
+          updated_at: string
           uuid: string
         }
         Insert: {
           author_id?: string
           content: string
-          created_at?: string | null
+          created_at?: string
           id?: number
           keywords?: string[] | null
           location_id?: number | null
           title: string
-          updated_at?: string | null
+          updated_at?: string
           uuid?: string
         }
         Update: {
           author_id?: string
           content?: string
-          created_at?: string | null
+          created_at?: string
           id?: number
           keywords?: string[] | null
           location_id?: number | null
           title?: string
-          updated_at?: string | null
+          updated_at?: string
           uuid?: string
         }
         Relationships: [
@@ -120,8 +120,9 @@ export type Database = {
           education: string | null
           full_name: string
           id: string
+          location_id: number | null
           occupation: string | null
-          updated_at: string | null
+          updated_at: string
           username: string | null
           uuid: string
           website: string | null
@@ -132,8 +133,9 @@ export type Database = {
           education?: string | null
           full_name: string
           id: string
+          location_id?: number | null
           occupation?: string | null
-          updated_at?: string | null
+          updated_at?: string
           username?: string | null
           uuid?: string
           website?: string | null
@@ -144,43 +146,52 @@ export type Database = {
           education?: string | null
           full_name?: string
           id?: string
+          location_id?: number | null
           occupation?: string | null
-          updated_at?: string | null
+          updated_at?: string
           username?: string | null
           uuid?: string
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       replies: {
         Row: {
           author_id: string
           content: string
-          created_at: string | null
+          created_at: string
           id: number
           post_id: number | null
           reply_id: number | null
-          updated_at: string | null
+          updated_at: string
           uuid: string
         }
         Insert: {
           author_id?: string
           content: string
-          created_at?: string | null
+          created_at?: string
           id?: number
           post_id?: number | null
           reply_id?: number | null
-          updated_at?: string | null
+          updated_at?: string
           uuid?: string
         }
         Update: {
           author_id?: string
           content?: string
-          created_at?: string | null
+          created_at?: string
           id?: number
           post_id?: number | null
           reply_id?: number | null
-          updated_at?: string | null
+          updated_at?: string
           uuid?: string
         }
         Relationships: [
