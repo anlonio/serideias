@@ -13,39 +13,54 @@ export const usePostStore = defineStore('post', () => {
       post.value?.replies.filter((reply) => reply.reply_id === parentReply.id)
   })
 
-  const fetchPosts = async () => {
-    const result = await supabase
-      .from('posts')
-      .select(
-        `
-        *,
-        author:profiles(
-          *,
-          location: locations(*)
-        ),
-        totalReplies:replies(count),
-        location:locations(*)
-      `,
-      )
-      .order('created_at', { ascending: false })
-      .limit(20)
+  const fetchPosts = (options = {}) => {
+    const result = useAsyncData(
+      'posts',
+      async () =>
+        await supabase
+          .from('posts')
+          .select(
+            `
+            *,
+            author:profiles(
+              *,
+              location: locations(*)
+              ),
+              totalReplies:replies(count),
+            location:locations(*)
+            `,
+          )
+          .order('created_at', { ascending: false })
+          .limit(20),
+      options,
+    )
+    result.then((result) => {
+      const postsData = result.data.value?.data
+      if (postsData) {
+        posts.value = postsData
+      }
+      return result
+    })
 
-    if (result.data) {
-      posts.value = result.data
-    }
+    return result
   }
 
-  const fetchPost = async (uuid: string) => {
-    const result = await supabase
-      .from('posts')
-      .select(
-        `
+  const fetchPost = () => {
+    const route = useRoute()
+    const uuid = route.params.uuid.toString()
+
+    const result = useAsyncData(
+      'post',
+      async () =>
+        await supabase
+          .from('posts')
+          .select(
+            `
         *,
         author:profiles(
           *,
           location: locations(*)
         ),
-        totalReplies:replies(count),
         replies(
           *,
           author:profiles(
@@ -53,15 +68,24 @@ export const usePostStore = defineStore('post', () => {
             location: locations(*)
           ) 
         ),
+        totalReplies:replies(count),
         location:locations(*)
       `,
-      )
-      .eq('uuid', uuid)
-      .maybeSingle()
+          )
+          .eq('uuid', uuid)
+          .order('created_at', { ascending: false, referencedTable: 'replies' })
+          .maybeSingle(),
+    )
 
-    if (result.data) {
-      post.value = result.data
-    }
+    result.then((result) => {
+      const postData = result.data.value?.data
+      if (postData) {
+        post.value = postData
+      }
+      return result
+    })
+
+    return result
   }
 
   const fetchVotes = async (post_id: number) => {
@@ -92,6 +116,21 @@ export const usePostStore = defineStore('post', () => {
     }
   }
 
+  const replyPost = async (
+    content: string,
+    post_id: number,
+    reply_id?: number,
+  ) => {
+    const { error } = await supabase.from('replies').insert({
+      content,
+      post_id,
+      reply_id,
+    })
+    if (error) {
+      throw error
+    }
+  }
+
   const locations = ref<LocationsRow[]>([])
 
   const fetchLocations = () => {
@@ -116,6 +155,7 @@ export const usePostStore = defineStore('post', () => {
     fetchVotes,
     fetchLocations,
     createPost,
+    replyPost,
     locations,
   }
 })

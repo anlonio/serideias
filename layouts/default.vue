@@ -57,15 +57,15 @@
         </VList>
       </VNavigationDrawer>
       <VAppBar flat border density="comfortable">
+        <slot name="toolbar-default" />
         <template #prepend>
           <v-app-bar-nav-icon @click="setNavigationDrawer" />
         </template>
         <VAppBarTitle>Serideias</VAppBarTitle>
         <template #append>
+          <slot name="toolbar-append" />
           <v-btn icon="mdi-magnify" />
-          <VBtn v-if="isAnon" variant="outlined" color="info" to="/login"
-            >fazer login</VBtn
-          >
+          <VBtn v-if="isAnon" color="info" to="/login">fazer login</VBtn>
           <v-btn icon="mdi-dots-vertical" />
         </template>
       </VAppBar>
@@ -76,6 +76,7 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore()
+const postStore = usePostStore()
 const { isAnon, profile } = storeToRefs(authStore)
 
 const railToggle = ref(true)

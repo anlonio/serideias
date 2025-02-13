@@ -11,6 +11,32 @@ export default defineNuxtPlugin((app) => {
     locale: {
       locale: 'pt-BR',
     },
+    defaults: {
+      VBtn: {
+        variant: 'outlined',
+      },
+      VCard: {
+        variant: 'outlined',
+      },
+      VChip: {
+        variant: 'outlined',
+      },
+      VChipGroup: {
+        variant: 'outlined',
+      },
+      VAutocomplete: {
+        variant: 'outlined',
+      },
+      VCombobox: {
+        variant: 'outlined',
+      },
+      VTextField: {
+        variant: 'outlined',
+      },
+      VTextarea: {
+        variant: 'outlined',
+      },
+    },
     ssr: true,
     theme: {
       themes: {

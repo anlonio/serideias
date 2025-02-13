@@ -1,10 +1,5 @@
 <template>
-  <v-card
-    class="mx-auto"
-    hover
-    variant="outlined"
-    :to="{ path: `/posts/${post.uuid}` }"
-  >
+  <v-card class="mx-auto" hover :to="{ path: `/posts/${post.uuid}` }">
     <VCardTitle>{{ post.title }}</VCardTitle>
     <VCardSubtitle> {{ createdAt }} </VCardSubtitle>
     <VCardText>
@@ -12,17 +7,10 @@
         {{ post.content }}
       </p>
       <VChipGroup>
-        <VChip
-          v-if="post.location"
-          variant="outlined"
-          prepend-icon="mdi-map-marker"
-          >{{ post.location.name }}</VChip
-        >
-        <VChip
-          v-for="keyword in post.keywords"
-          :key="keyword"
-          variant="outlined"
-        >
+        <VChip v-if="post.location" prepend-icon="mdi-map-marker">{{
+          post.location.name
+        }}</VChip>
+        <VChip v-for="keyword in post.keywords" :key="keyword">
           {{ keyword }}
         </VChip>
       </VChipGroup>

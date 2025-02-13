@@ -11,7 +11,6 @@
                   v-model="title.value.value"
                   :error-messages="title.errors.value"
                   label="Título"
-                  variant="outlined"
                 />
               </VCol>
             </VRow>
@@ -20,7 +19,6 @@
                 <VTextarea
                   v-model="content.value.value"
                   :error-messages="content.errors.value"
-                  variant="outlined"
                   label="Conteúdo"
                   placeholder="Escreva sua ideia aqui..."
                 />
@@ -34,11 +32,10 @@
                   multiple
                   label="palavras-chave"
                   chips
-                  variant="outlined"
                 >
                   <template #details>
                     <span
-                      >Pressione <kbd>Enter</kbd> para adicionar a
+                      >Pressione <code>Enter</code> para adicionar a
                       palavra-chave</span
                     >
                   </template>
@@ -50,10 +47,10 @@
                 <VAutocomplete
                   v-model="location.value.value"
                   :error-messages="location.errors.value"
-                  variant="outlined"
                   :items="locations"
                   item-title="name"
                   item-value="id"
+                  label="Cidade"
                 />
               </VCol>
             </VRow>
@@ -66,7 +63,6 @@
             </VRow>
           </VCol>
         </VRow>
-        {{ values }}
       </VContainer>
     </VForm>
   </VMain>
@@ -81,7 +77,7 @@ const postStore = usePostStore()
 await postStore.fetchLocations()
 const { locations } = storeToRefs(postStore)
 
-const { handleSubmit, values } = useForm<NewPost>({
+const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(newPostSchema),
 })
 
