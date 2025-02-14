@@ -2,21 +2,25 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
-  devtools: { enabled: true },
-  compatibilityDate: "2024-11-17",
+  devtools: {
+    enabled: true,
+    componentInspector: false,
+  },
+  compatibilityDate: '2024-11-17',
   build: {
     transpile: ['vuetify'],
   },
   imports: {
     dirs: ['stores', '@types'],
     presets: [
-      { 
+      {
         from: 'zod',
-        imports: ['z']
-      }
-    ]
+        imports: ['z'],
+      },
+    ],
   },
   modules: [
+    'nuxt-snackbar',
     '@pinia/nuxt',
     '@vee-validate/nuxt',
     'nuxt-zod-i18n',
@@ -42,7 +46,7 @@ export default defineNuxtConfig({
     classPrefix: '',
     classSuffix: '-mode',
     storage: 'cookie', // or 'sessionStorage' or 'cookie'
-    storageKey: 'nuxt-color-mode'
+    storageKey: 'nuxt-color-mode',
   },
   vite: {
     vue: {
@@ -53,14 +57,20 @@ export default defineNuxtConfig({
   },
   i18n: {
     defaultLocale: 'pt-BR',
-    locales: [{code: 'pt-BR', file: 'pt-BR.json'}],
-    lazy: true
+    locales: [{ code: 'pt-BR', file: 'pt-BR.json' }],
+    lazy: true,
   },
   supabase: {
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      exclude: ['/', '/register' , '/api/*']
-    }
-  }
+      exclude: ['/', '/register', '/api/*'],
+    },
+  },
+  snackbar: {
+    top: true,
+    right: true,
+    duration: 5000,
+  },
 })
+

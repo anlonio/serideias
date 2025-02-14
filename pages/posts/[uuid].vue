@@ -13,28 +13,7 @@
               <ProfileItem :author="post.author" :created-at="post.created_at">
                 <template #append>
                   <VRow class="gc-2">
-                    <VBtn
-                      v-tooltip="{ location: 'top', text: 'Achei relevante' }"
-                      variant="plain"
-                      density="compact"
-                      icon="mdi-arrow-up-bold"
-                    />
-                    <span
-                      v-tooltip="{
-                        location: 'top',
-                        text: `+ ${upVote} | - ${downVote}`,
-                      }"
-                      >{{ totalVotes }}</span
-                    >
-                    <VBtn
-                      v-tooltip="{
-                        location: 'top',
-                        text: 'Não achei relevante',
-                      }"
-                      variant="plain"
-                      density="compact"
-                      icon="mdi-arrow-down-bold"
-                    />
+                    <PostVotesItem :post-id="post.id" />
                   </VRow>
                 </template>
               </ProfileItem>
@@ -98,67 +77,11 @@
             <VDivider />
           </VRow>
           <v-expand-transition group>
-            <VRow v-for="reply in rootReplies" :key="reply.uuid">
-              <VCol>
-                <VRow>
-                  <VCol class="pa-0 ma-0">
-                    <VCard variant="flat" :text="reply.content">
-                      <template #title>
-                        <ProfileItem
-                          :author="reply.author"
-                          :created-at="reply.created_at"
-                        />
-                      </template>
-                      <template #actions>
-                        <VBtn
-                          variant="plain"
-                          density="compact"
-                          icon="mdi-arrow-up-bold"
-                        />
-                        <span>{{ totalVotes }}</span>
-                        <VBtn
-                          variant="plain"
-                          density="compact"
-                          icon="mdi-arrow-down-bold"
-                        />
-                      </template>
-                    </VCard>
-                  </VCol>
-                </VRow>
-                <VRow
-                  v-for="nestedReply in nestedReplies(reply)"
-                  :key="nestedReply.uuid"
-                >
-                  <VCol cols="1" class="text-center pa-0 ma-0">
-                    <VDivider inset vertical length="100%" thickness="2" />
-                  </VCol>
-                  <VCol>
-                    <VCard variant="flat" :text="nestedReply.content">
-                      <template #title>
-                        <ProfileItem
-                          :author="nestedReply.author"
-                          :created-at="nestedReply.created_at"
-                        />
-                      </template>
-                      <template #actions>
-                        <VBtn
-                          variant="plain"
-                          density="compact"
-                          icon="mdi-arrow-up-bold"
-                        />
-                        <span>{{ totalVotes }}</span>
-                        <VBtn
-                          variant="plain"
-                          density="compact"
-                          icon="mdi-arrow-down-bold"
-                        />
-                      </template>
-                    </VCard>
-                  </VCol>
-                </VRow>
-              </VCol>
-              <VDivider />
-            </VRow>
+            <PostReplyItem
+              v-for="reply in rootReplies"
+              :key="reply.uuid"
+              :reply="reply"
+            ></PostReplyItem>
           </v-expand-transition>
         </VCol>
       </VRow>
@@ -171,48 +94,13 @@
 
 <script lang="ts" setup>
 const postStore = usePostStore()
-const { post, rootReplies, nestedReplies } = storeToRefs(postStore)
-
-const upVote = ref<number | null>(null)
-const downVote = ref<number | null>(null)
-const totalVotes = computed(() => {
-  return (upVote.value ?? 0) - (downVote.value ?? 0)
-})
-
-const getVotes = async (post: PostsRowFullWithReplies) => {
-  const result = await postStore.fetchVotes(post.id)
-  upVote.value = result.upVote
-  downVote.value = result.downVote
-}
-
-watchEffect(() => {
-  if (post.value) {
-    getVotes(post.value)
-  }
-})
+const { post, rootReplies } = storeToRefs(postStore)
 
 const replyForm = useTemplateRef('replyForm')
 
-const { handleSubmit, handleReset } = useForm({
-  validationSchema: toTypedSchema(
-    z.object({
-      content: z.string().nonempty('Digite algo').max(200),
-      replyId: z.number().optional(),
-    }),
-  ),
-})
+const { onSubmit, loading } = useReplyForm(post.value?.id ?? 0)
 
 const replyContent = useField<string>('content')
-const loading = ref(false)
-const replyId = useField<number>('replyId')
-
-const onSubmit = handleSubmit(async ({ content, replyId }) => {
-  loading.value = true
-  await postStore.replyPost(content, post.value?.id ?? 0, replyId)
-  await postStore.fetchPost()
-  handleReset()
-  loading.value = false
-})
 
 post.value = null
 postStore.fetchPost()

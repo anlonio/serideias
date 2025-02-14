@@ -1,6 +1,8 @@
 export const usePostStore = defineStore('post', () => {
   const supabase = useSupabaseClient<Database>()
 
+  const authStore = useAuthStore()
+
   const posts = ref<PostsRowFull[]>([])
   const post = ref<PostsRowFullWithReplies | null>(null)
 
@@ -88,32 +90,55 @@ export const usePostStore = defineStore('post', () => {
     return result
   }
 
-  const fetchVotes = async (post_id: number) => {
+  const fetchVotes = async ({
+    postId,
+    replyId,
+  }: {
+    postId: number | undefined
+    replyId: number | undefined
+  }) => {
+    const itemId = postId ? postId : replyId
+
+    if (itemId === undefined) {
+      throw 'boooooo'
+    }
+
+    const fieldId = postId ? 'post_id' : 'reply_id'
+
     const { count: upVote } = await supabase
       .from('votes')
       .select('*', { count: 'exact', head: true })
-      .eq('post_id', post_id)
+      .eq(fieldId, itemId)
       .eq('is_upvote', true)
-      .returns<{ count: number }>()
 
     const { count: downVote } = await supabase
       .from('votes')
       .select('*', { count: 'exact', head: true })
-      .eq('post_id', post_id)
+      .eq(fieldId, itemId)
       .eq('is_upvote', false)
-      .returns<{ count: number }>()
+
+    let myVote = null
+
+    if (authStore.profile) {
+      const { data } = await supabase
+        .from('votes')
+        .select('*')
+        .eq('author_id', authStore.profile.id)
+        .eq(fieldId, itemId)
+        .maybeSingle()
+
+      if (data) myVote = data
+    }
 
     return {
-      upVote,
-      downVote,
+      upVote: upVote ?? 0,
+      downVote: downVote ?? 0,
+      myVote,
     }
   }
 
-  const createPost = async (post: NewPost) => {
-    const { error } = await supabase.from('posts').insert(post)
-    if (error) {
-      throw error
-    }
+  const createPost = (post: NewPost) => {
+    return supabase.from('posts').insert(post).select().maybeSingle()
   }
 
   const replyPost = async (
@@ -131,6 +156,47 @@ export const usePostStore = defineStore('post', () => {
     }
   }
 
+  const saveVote = async (
+    upVote: boolean | undefined,
+    post_id?: number,
+    reply_id?: number,
+  ) => {
+    if (!authStore.profile) return
+
+    if (upVote === undefined) {
+      return supabase
+        .from('votes')
+        .delete()
+        .eq('author_id', authStore.profile.id)
+        .then((result) => {
+          if (result.error) {
+            throw result.error
+          }
+          return result
+        })
+    }
+
+    return supabase
+      .from('votes')
+      .upsert(
+        {
+          is_upvote: upVote,
+          post_id,
+          author_id: authStore.profile.id,
+          reply_id,
+        },
+        {
+          onConflict: 'post_id, author_id',
+        },
+      )
+      .then((result) => {
+        if (result.error) {
+          throw result.error
+        }
+        return result
+      })
+  }
+
   const locations = ref<LocationsRow[]>([])
 
   const fetchLocations = () => {
@@ -139,9 +205,9 @@ export const usePostStore = defineStore('post', () => {
       const { data } = await supabase
         .from('locations')
         .select('*')
-        .returns<LocationsRow[]>()
+        .order('name')
       locations.value = data ?? []
-      return data
+      return data ?? []
     })
   }
 
@@ -156,6 +222,7 @@ export const usePostStore = defineStore('post', () => {
     fetchLocations,
     createPost,
     replyPost,
+    saveVote,
     locations,
   }
 })

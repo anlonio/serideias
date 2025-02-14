@@ -47,20 +47,9 @@ import { useDate } from 'vuetify'
 
 const { post } = defineProps<{ post: PostsRowFull }>()
 
-const postStore = usePostStore()
-const upVote = ref<number | null>(null)
-const downVote = ref<number | null>(null)
-const totalVotes = computed(() => {
-  return (upVote.value ?? 0) - (downVote.value ?? 0)
-})
+const { totalVotes, getVotes } = useCountVotes()
 
-const getVotes = async () => {
-  const result = await postStore.fetchVotes(post.id)
-  upVote.value = result.upVote
-  downVote.value = result.downVote
-}
-
-getVotes()
+getVotes({ postId: post.id })
 
 const getVotesIcon = computed(() => {
   return totalVotes.value >= 0 ? 'mdi-arrow-up-bold' : 'mdi-arrow-down-bold'

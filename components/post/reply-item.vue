@@ -1,0 +1,96 @@
+<template>
+  <VRow>
+    <VCol>
+      <VRow>
+        <VCol class="pa-0 ma-0">
+          <VForm ref="replyForm" @submit.prevent="onSubmit">
+            <VCard variant="flat" :text="reply.content">
+              <template #title>
+                <ProfileItem
+                  :author="reply.author"
+                  :created-at="reply.created_at"
+                />
+              </template>
+              <template #actions>
+                <PostVotesItem :reply-id="reply.id" />
+                <input id="submitForm" type="submit" hidden />
+                <VTextField
+                  v-if="showInput"
+                  v-model="replyContent.value.value"
+                  autofocus
+                  :error-messages="replyContent.errors.value"
+                  :loading="loading"
+                  counter
+                  maxlength="200"
+                  hide-details
+                  density="compact"
+                  :placeholder="`Responder @${reply.author.username}`"
+                  append-icon="mdi-close"
+                  @click:append="showInput = false"
+                  @keydown.esc="showInput = false"
+                >
+                  <template #append-inner>
+                    <VBtn
+                      icon="mdi-send"
+                      variant="plain"
+                      density="compact"
+                      :ripple="false"
+                      :disabled="!!errors.content"
+                      @click="replyForm?.requestSubmit()"
+                    />
+                  </template>
+                </VTextField>
+                <VBtn
+                  v-else
+                  prepend-icon="mdi-comment-outline"
+                  variant="plain"
+                  density="compact"
+                  class="text-none"
+                  @click="showInput = true"
+                >
+                  responder
+                </VBtn>
+              </template>
+            </VCard>
+          </VForm>
+        </VCol>
+        <VDivider />
+      </VRow>
+      <template v-if="!parentReplyId">
+        <VRow
+          v-for="nestedReply in nestedReplies(reply)"
+          :key="nestedReply.uuid"
+        >
+          <VCol cols="1" class="text-center pa-0 ma-0">
+            <VDivider inset vertical length="100%" thickness="2" />
+          </VCol>
+          <VCol>
+            <PostReplyItem :reply="nestedReply" :parent-reply-id="reply.id" />
+          </VCol>
+        </VRow>
+      </template>
+    </VCol>
+  </VRow>
+</template>
+
+<script lang="ts" setup>
+const { reply, parentReplyId } = defineProps<{
+  reply: RepliesRow
+  parentReplyId?: number
+}>()
+const postStore = usePostStore()
+const { nestedReplies } = storeToRefs(postStore)
+
+const replyForm = useTemplateRef('replyForm')
+const { onSubmit, loading, errors } = useReplyForm(
+  reply.post_id,
+  parentReplyId ?? reply.id,
+)
+
+const replyContent = useField<string>('content')
+
+const showInput = ref(false)
+</script>
+
+<style></style>
+

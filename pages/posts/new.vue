@@ -69,15 +69,16 @@
 </template>
 
 <script lang="ts" setup>
-definePageMeta({
-  title: 'Nova Publicação',
-})
-
 const postStore = usePostStore()
+const authStore = useAuthStore()
 await postStore.fetchLocations()
 const { locations } = storeToRefs(postStore)
+const { profile } = storeToRefs(authStore)
 
 const { handleSubmit } = useForm({
+  initialValues: {
+    location_id: profile.value?.location_id ?? null,
+  },
   validationSchema: toTypedSchema(newPostSchema),
 })
 
@@ -89,12 +90,31 @@ const location = useField('location_id')
 const loading = ref(false)
 
 const router = useRouter()
+const snackbar = useSnackbar()
 
 const onSubmit = handleSubmit(async (post) => {
-  loading.value = true
-  await postStore.createPost(post)
-  loading.value = false
-  router.push('/')
+  try {
+    loading.value = true
+    const { error, data } = await postStore.createPost(post)
+    if (error) {
+      snackbar.add({
+        text: error.message,
+        type: 'error',
+        title: 'Erro ao atualizar perfil',
+      })
+      return
+    }
+    router.push(`/posts/${data?.uuid}`)
+  } catch (error) {
+    console.error(error)
+    snackbar.add({
+      text: 'Erro no sistema. Contate o administrador',
+      type: 'error',
+      title: 'Erro ao criar publicação',
+    })
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 

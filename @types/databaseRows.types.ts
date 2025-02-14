@@ -23,3 +23,5 @@ export type RepliesRow = DatabaseTables['replies']['Row'] & {
 }
 export type LocationsRow = DatabaseTables['locations']['Row']
 
+export type VotesRow = DatabaseTables['votes']['Row']
+

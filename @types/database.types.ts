@@ -123,7 +123,7 @@ export type Database = {
           location_id: number | null
           occupation: string | null
           updated_at: string
-          username: string | null
+          username: string
           uuid: string
           website: string | null
         }
@@ -136,7 +136,7 @@ export type Database = {
           location_id?: number | null
           occupation?: string | null
           updated_at?: string
-          username?: string | null
+          username: string
           uuid?: string
           website?: string | null
         }
@@ -149,7 +149,7 @@ export type Database = {
           location_id?: number | null
           occupation?: string | null
           updated_at?: string
-          username?: string | null
+          username?: string
           uuid?: string
           website?: string | null
         }
@@ -169,7 +169,7 @@ export type Database = {
           content: string
           created_at: string
           id: number
-          post_id: number | null
+          post_id: number
           reply_id: number | null
           updated_at: string
           uuid: string
@@ -179,7 +179,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: number
-          post_id?: number | null
+          post_id: number
           reply_id?: number | null
           updated_at?: string
           uuid?: string
@@ -189,7 +189,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: number
-          post_id?: number | null
+          post_id?: number
           reply_id?: number | null
           updated_at?: string
           uuid?: string
@@ -220,24 +220,34 @@ export type Database = {
       }
       votes: {
         Row: {
+          author_id: string
           id: number
           is_upvote: boolean
           post_id: number | null
-          user_id: string | null
+          reply_id: number | null
         }
         Insert: {
+          author_id?: string
           id?: number
           is_upvote: boolean
           post_id?: number | null
-          user_id?: string | null
+          reply_id?: number | null
         }
         Update: {
+          author_id?: string
           id?: number
           is_upvote?: boolean
           post_id?: number | null
-          user_id?: string | null
+          reply_id?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "votes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "votes_post_id_fkey"
             columns: ["post_id"]
@@ -246,10 +256,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "votes_user_id_fkey1"
-            columns: ["user_id"]
+            foreignKeyName: "votes_reply_id_fkey"
+            columns: ["reply_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "replies"
             referencedColumns: ["id"]
           },
         ]

@@ -8,9 +8,6 @@ import colors from 'vuetify/util/colors'
 
 export default defineNuxtPlugin((app) => {
   const vuetify = createVuetify({
-    locale: {
-      locale: 'pt-BR',
-    },
     defaults: {
       VBtn: {
         variant: 'outlined',

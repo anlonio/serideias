@@ -45,7 +45,9 @@
                       <VBtn color="info" class="mr-4" variant="text" to="/login"
                         >Fazer Login</VBtn
                       >
-                      <VBtn color="success" type="submit">Cadastrar</VBtn>
+                      <VBtn color="success" type="submit" :loading="loading"
+                        >Cadastrar</VBtn
+                      >
                     </VRow>
                   </VCol>
                 </VRow>
@@ -72,14 +74,45 @@ const email = useField('email')
 const password = useField('password.password')
 const confirmPassword = useField('password.confirmPassword')
 
-const username = useField('username')
+const username = useField<string>('username')
 const fullName = useField('fullName')
 
 const authStore = useAuthStore()
 
+const loading = ref(false)
+const snackbar = useSnackbar()
+
 const onSubmit = handleSubmit(async (data) => {
-  const result = await useAsyncData('signUp', () => authStore.signUp(data))
-  console.log(result)
+  try {
+    if (await authStore.checkUsername(username.value.value)) {
+      return username.setErrors('Usuário já existe')
+    }
+    loading.value = true
+    const { error } = await authStore.signUp(data)
+    if (error) {
+      snackbar.add({
+        text: error.message,
+        type: 'error',
+        title: 'Erro no cadastro',
+      })
+      return
+    }
+
+    snackbar.add({
+      text: 'Você receberá um e-mail de confirmação, confira a caixa de entrada do email cadastrado',
+      type: 'success',
+      title: 'Cadastro realizado',
+    })
+  } catch (error) {
+    console.error(error)
+    snackbar.add({
+      text: 'Erro no sistema. Contate o administrador',
+      type: 'error',
+      title: 'Erro no cadastro',
+    })
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 

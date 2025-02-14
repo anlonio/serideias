@@ -9,11 +9,19 @@
         <VList>
           <VListItem
             v-if="profile"
-            prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
             :subtitle="`@${profile.username}`"
             :title="profile.full_name"
             to="/profile/view"
-          />
+          >
+            <template #prepend>
+              <VIcon
+                v-if="!profile.avatar_url"
+                icon="mdi-account-circle"
+                size="24"
+              />
+              <VAvatar v-else :image="profile.avatar_url ?? ''" />
+            </template>
+          </VListItem>
           <VListItem
             v-else
             title="Fazer Login"
@@ -39,16 +47,12 @@
               prepend-icon="mdi-folder-account"
             />
             <VListItem
-              to="/profile/view"
+              to="/profile/edit"
               title="Editar Perfil"
               prepend-icon="mdi-account-cog"
             />
             <VListItem
-              to="/profile/preferences"
-              title="Preferências"
-              prepend-icon="mdi-cog"
-            />
-            <VListItem
+              v-if="profile"
               title="Sair"
               prepend-icon="mdi-logout"
               @click="signOut"
@@ -64,9 +68,7 @@
         <VAppBarTitle>Serideias</VAppBarTitle>
         <template #append>
           <slot name="toolbar-append" />
-          <v-btn icon="mdi-magnify" />
           <VBtn v-if="isAnon" color="info" to="/login">fazer login</VBtn>
-          <v-btn icon="mdi-dots-vertical" />
         </template>
       </VAppBar>
       <slot />
@@ -76,7 +78,6 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore()
-const postStore = usePostStore()
 const { isAnon, profile } = storeToRefs(authStore)
 
 const railToggle = ref(true)

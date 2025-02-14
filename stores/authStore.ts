@@ -1,27 +1,35 @@
 export const useAuthStore = defineStore('auth', () => {
-  const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient<Database>()
   const session = useSupabaseSession()
-
   const user = useSupabaseUser()
+  const router = useRouter()
+
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') {
+      router.push('/')
+    }
+  })
 
   const profile = ref<ProfilesRow | null>(null)
 
-  const fetchProfile = (id: string) =>
-    supabase
-      .from('profiles')
-      .select(
-        `
+  const fetchProfile = (id: string) => {
+    return useAsyncData('profile', async () =>
+      supabase
+        .from('profiles')
+        .select(
+          `
         *,
         location:locations(*)
         `,
-      )
-      .eq('id', id)
-      .returns<ProfilesRow>()
-      .maybeSingle()
-      .then((profileDB) => {
-        profile.value = profileDB.data
-        return profileDB.data
-      })
+        )
+        .eq('id', id)
+        .maybeSingle()
+        .then((profileDB) => {
+          profile.value = profileDB.data
+          return profileDB.data
+        }),
+    )
+  }
 
   watchEffect(() => {
     if (user.value) {
@@ -52,6 +60,40 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAnon = computed(() => !session.value)
 
-  return { signUp, signIn, signOut, isAnon, user, profile, session }
+  const updateProfile = (data: EditProfile) => {
+    if (!profile.value) {
+      throw Error('booooo')
+    }
+
+    return supabase
+      .from('profiles')
+      .update(data)
+      .eq('id', profile.value.id)
+      .select()
+  }
+
+  const checkUsername = async (username: string) => {
+    const { count } = await supabase
+      .from('profiles')
+      .select('username', { count: 'exact' })
+      .eq('username', username)
+      .maybeSingle()
+    console.log(count)
+
+    return count !== 0
+  }
+
+  return {
+    signUp,
+    signIn,
+    signOut,
+    isAnon,
+    user,
+    profile,
+    session,
+    fetchProfile,
+    updateProfile,
+    checkUsername,
+  }
 })
 

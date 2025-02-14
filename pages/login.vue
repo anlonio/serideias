@@ -70,9 +70,34 @@ watch(
   },
 )
 
+const { t } = useI18n()
+const snackbar = useSnackbar()
+
+const loading = ref(false)
+
 const onSubmit = handleSubmit(async (data) => {
-  const result = await useAsyncData('signIn', () => authStore.signIn(data))
-  console.log(result)
+  try {
+    loading.value = true
+    const { error } = await authStore.signIn(data)
+
+    if (error) {
+      snackbar.add({
+        text: t(`supabase.errors.${error.code}`),
+        type: 'error',
+        title: 'Erro ao efetuar login',
+      })
+      return
+    }
+  } catch (error) {
+    console.error(error)
+    snackbar.add({
+      text: 'Erro no sistema. Contate o administrador',
+      type: 'error',
+      title: 'Erro ao efetuar login',
+    })
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
