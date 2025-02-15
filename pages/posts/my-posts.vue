@@ -18,10 +18,21 @@
             <VRow justify="center">
               <VCol>
                 <VMainCard
-                  :prepend-avatar="profile.avatar_url ?? ''"
                   :title="profile.full_name"
                   :subtitle="`@${profile.username}`"
                 >
+                  <template #prepend>
+                    <VAvatar
+                      v-if="profile.avatar_url"
+                      size="80"
+                      :image="profile.avatar_url"
+                    />
+                    <VAvatar
+                      v-else
+                      size="80"
+                      image="/public/account-circle.png"
+                    />
+                  </template>
                   <VCardText>
                     <VBtn
                       v-if="profile.location"

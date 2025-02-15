@@ -72,9 +72,34 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAnon = computed(() => !session.value)
 
-  const updateProfile = (data: EditProfile) => {
+  const updateProfile = async (data: EditProfile) => {
     if (!profile.value) {
       throw Error('booooo')
+    }
+
+    if (data.avatar_url instanceof File) {
+      const ext = data.avatar_url.name.split('.').pop()
+
+      // VERIFICAR SE EXISTE, PARA ALTERAR OU FAZER UPLOAD
+      // VERIFICAR SE FOI REMOVIDO, PARA REMOVER DO BUCKET
+
+      const result = await supabase.storage
+        .from('avatar')
+        .upload(`${profile.value.id}.${ext}`, data.avatar_url)
+      if (result.error) {
+        throw Error('something went wrong with image upload')
+      }
+      if (result.data) {
+        console.log(result.data)
+
+        const publicUrl = await supabase.storage
+          .from('avatar')
+          .getPublicUrl(result.data.path)
+
+        data.avatar_url = publicUrl.data.publicUrl
+      } else {
+        data.avatar_url = undefined
+      }
     }
 
     return supabase

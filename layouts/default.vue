@@ -15,12 +15,8 @@
             @click="$router.push('/posts/my-posts')"
           >
             <template #prepend>
-              <VIcon
-                v-if="!profile.avatar_url"
-                icon="mdi-account-circle"
-                size="24"
-              />
-              <VAvatar v-else :image="profile.avatar_url ?? ''" />
+              <VAvatar v-if="profile.avatar_url" :image="profile.avatar_url" />
+              <VAvatar v-else image="/public/account-circle.png" />
             </template>
           </VListItem>
           <VListItem

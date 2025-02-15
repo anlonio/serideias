@@ -65,7 +65,11 @@
         <VRow>
           <v-list-item class="w-100">
             <template v-if="$vuetify.display.smAndUp" #prepend>
-              <v-avatar color="grey-darken-3" />
+              <VAvatar
+                v-if="post.author.avatar_url"
+                :image="post.author.avatar_url"
+              />
+              <VAvatar v-else image="/public/account-circle.png" />
             </template>
 
             <v-list-item-title>{{ post.author.full_name }}</v-list-item-title>

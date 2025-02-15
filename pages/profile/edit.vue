@@ -8,6 +8,39 @@
               <template #title>
                 <span class="text-h4">Editar Perfil</span>
               </template>
+              <template #append>
+                <template v-if="avatarUrl.value.value || profile?.avatar_url">
+                  <VBtn
+                    append-icon="mdi-pencil"
+                    variant="plain"
+                    density="compact"
+                    slim
+                    @click="open()"
+                  >
+                    alterar
+                  </VBtn>
+                  <VBtn
+                    variant="plain"
+                    density="compact"
+                    slim
+                    color="error"
+                    append-icon="mdi-delete"
+                    @click="avatarUrl.setValue(undefined)"
+                  >
+                    remover
+                  </VBtn>
+                </template>
+                <VBtn v-else append-icon="mdi-pencil" @click="open()">
+                  Adicionar foto
+                </VBtn>
+                <VAvatar
+                  v-if="previewAvatar || profile?.avatar_url"
+                  size="80"
+                  :image="(previewAvatar || profile?.avatar_url) ?? ''"
+                >
+                </VAvatar>
+                <VAvatar v-else size="80" image="/public/account-circle.png" />
+              </template>
               <template #text>
                 <VRow>
                   <VCol cols="12" sm="6">
@@ -91,6 +124,17 @@ const { profile, user } = storeToRefs(authStore)
 const { status } = postStore.fetchLocations()
 await authStore.fetchProfile(user.value?.id ?? '')
 
+const { file, open } = useFileSystemAccess({
+  types: [
+    {
+      accept: {
+        'images/*': ['.png'],
+      },
+    },
+  ],
+  dataType: 'Blob',
+})
+
 const { handleSubmit, handleReset, resetForm } = useForm({
   validationSchema: toTypedSchema(editProfileSchema),
 })
@@ -102,11 +146,22 @@ const website = useField('website')
 const occupation = useField('occupation')
 const education = useField('education')
 const locationId = useField('location_id')
+const avatarUrl = useField('avatar_url')
+const previewAvatar = ref('')
+
+watch(file, (newFile) => {
+  if (newFile) {
+    // Converte o arquivo para uma URL
+    avatarUrl.value.value = newFile
+    previewAvatar.value = URL.createObjectURL(newFile)
+  }
+})
 
 resetForm({
   values: {
     username: profile.value?.username,
     full_name: profile.value?.full_name,
+    avatar_url: profile.value?.avatar_url ?? undefined,
     bio: profile.value?.bio ?? undefined,
     website: profile.value?.website ?? undefined,
     occupation: profile.value?.occupation ?? undefined,

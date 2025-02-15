@@ -9,6 +9,10 @@ export const editProfileSchema = z.object({
     })
     .regex(/^\S*$/, { message: 'usuário não pode conter espaços' }),
   full_name: z.string().trim(),
+  avatar_url: z
+    .union([z.instanceof(File), z.string()])
+    .nullable()
+    .optional(),
   bio: z.string().trim().nullish(),
   website: z.string().trim().url().nullish(),
   occupation: z.string().trim().nullish(),
