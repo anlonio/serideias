@@ -90,7 +90,6 @@ export const useAuthStore = defineStore('auth', () => {
       .select('username', { count: 'exact' })
       .eq('username', username)
       .maybeSingle()
-    console.log(count)
 
     return count !== 0
   }

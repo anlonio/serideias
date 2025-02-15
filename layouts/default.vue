@@ -5,14 +5,14 @@
         v-model:rail="railToggle"
         v-model="drawerToggle"
         :expand-on-hover="expandOnHoverActive"
-        mobile-breakpoint="md"
+        mobile-breakpoint="lg"
       >
         <VList>
           <VListItem
             v-if="profile"
             :subtitle="`@${profile.username}`"
             :title="profile.full_name"
-            to="/profile/view"
+            to="/posts/my-posts"
           >
             <template #prepend>
               <VIcon
@@ -106,10 +106,11 @@ const expandOnHoverActive = ref(true)
 const display = useDisplay()
 
 watch(
-  display.xs,
+  display.mdAndDown,
   (value) => {
     expandOnHoverActive.value = !value
     railToggle.value = !value
+    drawerToggle.value = !value
   },
   {
     immediate: true,
@@ -117,7 +118,10 @@ watch(
 )
 
 const setNavigationDrawer = () => {
-  if (display.xs.value) {
+  console.log(display.name.value)
+  if (display.mdAndDown.value) {
+    console.log('aq')
+
     drawerToggle.value = !drawerToggle.value
     return
   }
@@ -129,7 +133,7 @@ const setNavigationDrawer = () => {
 const signOut = async () => {
   const { error } = await authStore.signOut()
   if (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

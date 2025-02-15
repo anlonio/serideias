@@ -2,6 +2,7 @@ export const usePostStore = defineStore('post', () => {
   const supabase = useSupabaseClient<Database>()
 
   const authStore = useAuthStore()
+  const { user } = storeToRefs(authStore)
 
   const posts = ref<PostsRowFull[]>([])
   const post = ref<PostsRowFullWithReplies | null>(null)
@@ -45,12 +46,18 @@ export const usePostStore = defineStore('post', () => {
           },
         )
       }
+
+      if (route.name?.toString().startsWith('MyPosts')) {
+        console.log('oe')
+
+        queryBuilder = queryBuilder.eq('author_id', user.value?.id ?? '')
+      }
+
       return await queryBuilder.then((result) => {
         const postsData = result.data
         if (postsData) {
           posts.value = postsData
         }
-        console.log(result.error)
 
         return result
       })
@@ -78,7 +85,6 @@ export const usePostStore = defineStore('post', () => {
                 return countB - countA
               })
             }
-            console.log(result.error)
 
             return result
           }),
@@ -157,11 +163,11 @@ export const usePostStore = defineStore('post', () => {
 
       let myVote = null
 
-      if (authStore.profile) {
+      if (user.value) {
         const { data } = await supabase
           .from('votes')
           .select('*')
-          .eq('author_id', authStore.profile.id)
+          .eq('author_id', user.value.id)
           .eq(fieldId, itemId)
           .maybeSingle()
 
@@ -200,13 +206,13 @@ export const usePostStore = defineStore('post', () => {
     post_id?: number,
     reply_id?: number,
   ) => {
-    if (!authStore.profile) return
+    if (!user.value) return
 
     if (upVote === undefined) {
       return supabase
         .from('votes')
         .delete()
-        .eq('author_id', authStore.profile.id)
+        .eq('author_id', user.value.id)
         .then((result) => {
           if (result.error) {
             throw result.error
@@ -221,7 +227,7 @@ export const usePostStore = defineStore('post', () => {
         {
           is_upvote: upVote,
           post_id,
-          author_id: authStore.profile.id,
+          author_id: user.value.id,
           reply_id,
         },
         {
@@ -240,7 +246,6 @@ export const usePostStore = defineStore('post', () => {
 
   const fetchLocations = () => {
     return useAsyncData('locations', async () => {
-      console.log('foo')
       const { data } = await supabase
         .from('locations')
         .select('*')

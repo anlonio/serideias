@@ -90,7 +90,7 @@ const saveVote = async (value: boolean | undefined) => {
     await postStore.saveVote(value, postId, replyId)
     await getVotes({ postId, replyId })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   } finally {
     pending.value = false
   }

@@ -5,6 +5,50 @@
         <VCol class="pa-0 ma-0">
           <VForm ref="replyForm" @submit.prevent="onSubmit">
             <VCard variant="flat" :text="reply.content">
+              <template #append>
+                <VMenu
+                  v-if="reply.author_id === profile?.id"
+                  location="bottom end"
+                >
+                  <template #activator="{ props }">
+                    <VBtn
+                      icon="mdi-dots-vertical"
+                      density="compact"
+                      variant="plain"
+                      v-bind="props"
+                      @click.stop="() => {}"
+                    />
+                  </template>
+                  <VList class="elevation-0 pa-0" variant="outlined">
+                    <VListItem
+                      title="excluir"
+                      append-icon="mdi-delete"
+                      @click.stop="deleteDialog = true"
+                    />
+                  </VList>
+                </VMenu>
+                <VDialog v-model="deleteDialog" width="240px">
+                  <VCard variant="flat">
+                    <template #title>
+                      <div class="text-center">Apagar publicação?</div>
+                    </template>
+                    <template #actions>
+                      <VBtn
+                        variant="text"
+                        color="error"
+                        @click="deleteDialog = false"
+                        >Cancelar</VBtn
+                      >
+                      <VBtn
+                        variant="text"
+                        color="success"
+                        @click="deleteDialog = false"
+                        >Confirmar</VBtn
+                      >
+                    </template>
+                  </VCard>
+                </VDialog>
+              </template>
               <template #title>
                 <ProfileItem
                   :author="reply.author"
@@ -79,7 +123,11 @@ const { reply, parentReplyId } = defineProps<{
   parentReplyId?: number
 }>()
 const postStore = usePostStore()
+const authStore = useAuthStore()
 const { nestedReplies } = storeToRefs(postStore)
+const { profile } = storeToRefs(authStore)
+
+const deleteDialog = ref(false)
 
 const replyForm = useTemplateRef('replyForm')
 const { onSubmit, loading, errors } = useReplyForm(

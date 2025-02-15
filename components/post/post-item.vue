@@ -1,6 +1,46 @@
 <template>
-  <v-card class="mx-auto" hover :to="{ path: `/posts/${post.uuid}` }">
-    <VCardTitle>{{ post.title }}</VCardTitle>
+  <v-card
+    class="mx-auto"
+    hover
+    @click="$router.push({ path: `/posts/${post.uuid}` })"
+  >
+    <VCardTitle class="d-flex align-center">
+      {{ post.title }}
+      <VSpacer></VSpacer>
+      <VMenu v-if="post.author_id === profile?.id" location="bottom end">
+        <template #activator="{ props }">
+          <VBtn
+            icon="mdi-dots-vertical"
+            density="compact"
+            variant="plain"
+            v-bind="props"
+            @click.stop="() => {}"
+          />
+        </template>
+        <VList class="elevation-0 pa-0" variant="outlined">
+          <VListItem
+            title="excluir"
+            append-icon="mdi-delete"
+            @click.stop="deleteDialog = true"
+          />
+        </VList>
+      </VMenu>
+      <VDialog v-model="deleteDialog" width="240px">
+        <VCard variant="flat">
+          <template #title>
+            <div class="text-center">Apagar publicação?</div>
+          </template>
+          <template #actions>
+            <VBtn variant="text" color="error" @click="deleteDialog = false"
+              >Cancelar</VBtn
+            >
+            <VBtn variant="text" color="success" @click="deleteDialog = false"
+              >Confirmar</VBtn
+            >
+          </template>
+        </VCard>
+      </VDialog>
+    </VCardTitle>
     <VCardSubtitle> {{ createdAt }} </VCardSubtitle>
     <VCardText>
       <p>
@@ -45,9 +85,14 @@
 <script lang="ts" setup>
 import { useDate } from 'vuetify'
 
+const authStore = useAuthStore()
+const { profile } = storeToRefs(authStore)
+
 const { post } = defineProps<{ post: PostsRowFull }>()
 
 const { totalVotes, getVotes } = useCountVotes()
+
+const deleteDialog = ref(false)
 
 getVotes({ postId: post.id })
 
