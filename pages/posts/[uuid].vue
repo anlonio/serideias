@@ -45,7 +45,7 @@
           </VRow>
           <VRow>
             <VCol>
-              <span class="text-h4"
+              <span class="text-h5"
                 >Respostas ({{ post.totalReplies[0].count }})</span
               >
             </VCol>
