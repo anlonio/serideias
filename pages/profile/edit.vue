@@ -4,7 +4,7 @@
       <VRow justify="center">
         <VCol sm="12" md="10" lg="7" xl="6" xxl="4">
           <VForm @submit.prevent="onSubmit">
-            <VCard :loading="loading">
+            <VMainCard :loading="loading">
               <template #title>
                 <span class="text-h4">Editar Perfil</span>
               </template>
@@ -74,7 +74,7 @@
                   >Salvar</VBtn
                 >
               </template>
-            </VCard>
+            </VMainCard>
           </VForm>
         </VCol>
       </VRow>

@@ -28,7 +28,7 @@
                 sm="6"
                 lg="4"
               >
-                <VCard :title="location.name">
+                <VMainCard :title="location.name">
                   <template #append>
                     <VBadge bordered color="grey" class="pr-4">
                       <template #badge>{{ location.posts[0].count }}</template>
@@ -41,7 +41,7 @@
                       <VIcon icon="mdi-account"></VIcon>
                     </VBadge>
                   </template>
-                </VCard>
+                </VMainCard>
               </VCol>
             </VRow>
           </VCol>

@@ -1,5 +1,5 @@
 <template>
-  <v-card
+  <VMainCard
     class="mx-auto"
     hover
     @click="$router.push({ path: `/posts/${post.uuid}` })"
@@ -26,7 +26,7 @@
         </VList>
       </VMenu>
       <VDialog v-model="deleteDialog" width="240px">
-        <VCard variant="flat">
+        <VMainCard variant="flat">
           <template #title>
             <div class="text-center">Apagar publicação?</div>
           </template>
@@ -38,14 +38,15 @@
               >Confirmar</VBtn
             >
           </template>
-        </VCard>
+        </VMainCard>
       </VDialog>
     </VCardTitle>
     <VCardSubtitle> {{ createdAt }} </VCardSubtitle>
-    <VCardText>
-      <p>
-        {{ post.content }}
-      </p>
+    <VCardText class="flex-wrap">
+      <VuetifyViewer
+        markdown-theme="github"
+        :value="post.content"
+      ></VuetifyViewer>
       <VChipGroup>
         <VChip v-if="post.location" prepend-icon="mdi-map-marker">{{
           post.location.name
@@ -79,7 +80,7 @@
         </template>
       </v-list-item>
     </VCardActions>
-  </v-card>
+  </VMainCard>
 </template>
 
 <script lang="ts" setup>

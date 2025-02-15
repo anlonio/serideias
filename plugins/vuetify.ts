@@ -5,21 +5,27 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
 import colors from 'vuetify/util/colors'
+import { VCard } from 'vuetify/components'
 
 export default defineNuxtPlugin((app) => {
   const vuetify = createVuetify({
+    aliases: {
+      VMainCard: VCard,
+    },
     defaults: {
-      VBtn: {
+      VMainCard: {
         variant: 'outlined',
       },
-      VCard: {
+      VBtn: {
         variant: 'outlined',
       },
       VChip: {
         variant: 'outlined',
+        readonly: true,
       },
       VChipGroup: {
         variant: 'outlined',
+        readonly: true,
       },
       VAutocomplete: {
         variant: 'outlined',

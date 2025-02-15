@@ -17,7 +17,7 @@
           <VCol sm="10" md="10" lg="6" xl="5">
             <VRow justify="center">
               <VCol>
-                <VCard
+                <VMainCard
                   :prepend-avatar="profile.avatar_url ?? ''"
                   :title="profile.full_name"
                   :subtitle="`@${profile.username}`"
@@ -73,7 +73,7 @@
                   <template #append>
                     <VBtn color="info" to="/profile/edit">Editar perfil</VBtn>
                   </template>
-                </VCard>
+                </VMainCard>
               </VCol>
             </VRow>
             <VRow v-for="post in posts" :key="post.uuid" justify="center">

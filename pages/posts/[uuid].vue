@@ -24,7 +24,10 @@
           </VRow>
           <VRow>
             <VCol class="py-4">
-              <p>{{ post.content }}</p>
+              <VuetifyViewer
+                markdown-theme="github"
+                :value="post.content"
+              ></VuetifyViewer>
               <br />
               <span class="text-caption font-weight-bold">Palavras-chave:</span>
               <VChipGroup>
@@ -93,6 +96,8 @@
 </template>
 
 <script lang="ts" setup>
+import { VuetifyViewer } from 'vuetify-pro-tiptap'
+
 const postStore = usePostStore()
 const { post, rootReplies } = storeToRefs(postStore)
 

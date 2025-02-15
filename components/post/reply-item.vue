@@ -4,7 +4,7 @@
       <VRow>
         <VCol class="pa-0 ma-0">
           <VForm ref="replyForm" @submit.prevent="onSubmit">
-            <VCard variant="flat" :text="reply.content">
+            <VMainCard variant="flat" :text="reply.content">
               <template #append>
                 <VMenu
                   v-if="reply.author_id === profile?.id"
@@ -28,7 +28,7 @@
                   </VList>
                 </VMenu>
                 <VDialog v-model="deleteDialog" width="240px">
-                  <VCard variant="flat">
+                  <VMainCard variant="flat">
                     <template #title>
                       <div class="text-center">Apagar publicação?</div>
                     </template>
@@ -46,7 +46,7 @@
                         >Confirmar</VBtn
                       >
                     </template>
-                  </VCard>
+                  </VMainCard>
                 </VDialog>
               </template>
               <template #title>
@@ -95,7 +95,7 @@
                   responder
                 </VBtn>
               </template>
-            </VCard>
+            </VMainCard>
           </VForm>
         </VCol>
         <VDivider />

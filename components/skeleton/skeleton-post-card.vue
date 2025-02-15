@@ -1,5 +1,5 @@
 <template>
-  <VCard class="mx-auto">
+  <VMainCard class="mx-auto">
     <template #title>
       <VSkeletonLoader type="text" width="50%" />
     </template>
@@ -18,9 +18,10 @@
         <VSkeletonLoader type="actions" />
       </VCol>
     </VRow>
-  </VCard>
+  </VMainCard>
 </template>
 
 <script lang="ts" setup></script>
 
 <style></style>
+

@@ -15,14 +15,12 @@
               </VCol>
             </VRow>
             <VRow>
-              <VCol>
-                <VTextarea
+              <ClientOnly>
+                <VuetifyTiptap
                   v-model="content.value.value"
-                  :error-messages="content.errors.value"
-                  label="Conteúdo"
-                  placeholder="Escreva sua ideia aqui..."
-                />
-              </VCol>
+                  markdown-theme="github"
+                ></VuetifyTiptap>
+              </ClientOnly>
             </VRow>
             <VRow>
               <VCol>
@@ -78,12 +76,14 @@ const { profile } = storeToRefs(authStore)
 const { handleSubmit } = useForm({
   initialValues: {
     location_id: profile.value?.location_id ?? null,
+    title: '',
+    content: '',
   },
   validationSchema: toTypedSchema(newPostSchema),
 })
 
 const title = useField('title')
-const content = useField('content')
+const content = useField<string>('content')
 const keywords = useField<string[]>('keywords')
 const location = useField('location_id')
 
