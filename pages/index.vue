@@ -1,15 +1,30 @@
 <template>
   <NuxtLayout name="default">
-    <template #toolbar-append>
-      <v-btn icon="mdi-refresh" @click="execute" />
-    </template>
     <template #toolbar-default>
+      <VTextField
+        v-model="searchText"
+        label="Pesquisar por publicações"
+        density="compact"
+        append-inner-icon="mdi-magnify"
+        hide-details
+        variant="solo-filled"
+        single-line
+        flat
+        max-width="320px"
+        clearable
+        @click:clear="search"
+        @click:append-inner="search"
+        @keydown.enter="search"
+      />
       <VProgressLinear
         v-if="status === 'pending'"
         indeterminate
         location="bottom"
         absolute
       />
+    </template>
+    <template #toolbar-append>
+      <v-btn icon="mdi-refresh" @click="execute" />
     </template>
     <VMain>
       <VContainer v-if="status === 'success'">
@@ -55,6 +70,28 @@ const postStore = usePostStore()
 const { posts } = storeToRefs(postStore)
 
 const { status, execute } = await postStore.fetchPosts()
+
+const route = useRoute()
+
+watch(
+  () => route.query,
+  () => {
+    postStore.fetchPosts()
+  },
+  {
+    deep: true,
+  },
+)
+
+const searchText = ref('')
+
+if (route.query.search) {
+  searchText.value = route.query.search.toString()
+}
+
+const router = useRouter()
+const search = () =>
+  router.push({ path: '/', query: { search: searchText.value } })
 </script>
 
 <style></style>

@@ -62,26 +62,11 @@
         </VList>
       </VNavigationDrawer>
       <VAppBar flat border density="comfortable">
-        <slot name="toolbar-default" />
         <template #prepend>
           <v-app-bar-nav-icon @click="setNavigationDrawer" />
         </template>
         <VAppBarTitle v-if="$vuetify.display.smAndUp">Serideias</VAppBarTitle>
-        <VTextField
-          v-model="searchText"
-          label="Pesquisar por publicações"
-          density="compact"
-          append-inner-icon="mdi-magnify"
-          hide-details
-          variant="solo-filled"
-          single-line
-          flat
-          max-width="320px"
-          clearable
-          @click:clear="search"
-          @click:append-inner="search"
-          @keydown.enter="search"
-        />
+        <slot name="toolbar-default" />
         <template #append>
           <slot name="toolbar-append" />
           <VBtn v-if="isAnon" color="info" to="/login">fazer login</VBtn>
@@ -136,28 +121,6 @@ const signOut = async () => {
     console.error(error)
   }
 }
-
-const route = useRoute()
-
-watch(
-  () => route.query,
-  () => {
-    postStore.fetchPosts()
-  },
-  {
-    deep: true,
-  },
-)
-
-const searchText = ref('')
-
-if (route.query.search) {
-  searchText.value = route.query.search.toString()
-}
-
-const router = useRouter()
-const search = () =>
-  router.push({ path: '/', query: { search: searchText.value } })
 </script>
 
 <style></style>
