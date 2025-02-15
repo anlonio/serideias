@@ -25,7 +25,7 @@
                     slim
                     color="error"
                     append-icon="mdi-delete"
-                    @click="avatarUrl.setValue(undefined)"
+                    @click="avatarUrl.setValue(null)"
                   >
                     remover
                   </VBtn>
@@ -34,7 +34,10 @@
                   Adicionar foto
                 </VBtn>
                 <VAvatar
-                  v-if="previewAvatar || profile?.avatar_url"
+                  v-if="
+                    avatarUrl.value.value !== null &&
+                    (previewAvatar || profile?.avatar_url)
+                  "
                   size="80"
                   :image="(previewAvatar || profile?.avatar_url) ?? ''"
                 >

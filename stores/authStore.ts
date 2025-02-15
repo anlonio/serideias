@@ -72,35 +72,56 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAnon = computed(() => !session.value)
 
+  const upsertAvatar = async (avatar_url: EditProfile['avatar_url']) => {
+    if (!profile.value) {
+      throw Error('booooo')
+    }
+
+    const path = profile.value.avatar_url?.split('/').pop()
+
+    if (!avatar_url && path) {
+      return supabase.storage
+        .from('avatar')
+        .remove([path])
+        .then(() => null)
+    }
+
+    if (!avatar_url || !(avatar_url instanceof File)) {
+      return
+    }
+
+    const ext = avatar_url.name.split('.').pop()
+
+    if (path) {
+      await supabase.storage.from('avatar').remove([path])
+    }
+
+    const result = await supabase.storage
+      .from('avatar')
+      .upload(`${profile.value.id}.${ext}`, avatar_url)
+    if (result.error) {
+      throw Error('something went wrong with image upload')
+    }
+
+    if (result.data) {
+      console.log(result.data)
+
+      const publicUrl = await supabase.storage
+        .from('avatar')
+        .getPublicUrl(result.data.path)
+
+      return publicUrl.data.publicUrl
+    } else {
+      return
+    }
+  }
+
   const updateProfile = async (data: EditProfile) => {
     if (!profile.value) {
       throw Error('booooo')
     }
 
-    if (data.avatar_url instanceof File) {
-      const ext = data.avatar_url.name.split('.').pop()
-
-      // VERIFICAR SE EXISTE, PARA ALTERAR OU FAZER UPLOAD
-      // VERIFICAR SE FOI REMOVIDO, PARA REMOVER DO BUCKET
-
-      const result = await supabase.storage
-        .from('avatar')
-        .upload(`${profile.value.id}.${ext}`, data.avatar_url)
-      if (result.error) {
-        throw Error('something went wrong with image upload')
-      }
-      if (result.data) {
-        console.log(result.data)
-
-        const publicUrl = await supabase.storage
-          .from('avatar')
-          .getPublicUrl(result.data.path)
-
-        data.avatar_url = publicUrl.data.publicUrl
-      } else {
-        data.avatar_url = undefined
-      }
-    }
+    data.avatar_url = await upsertAvatar(data.avatar_url)
 
     return supabase
       .from('profiles')
