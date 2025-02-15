@@ -17,8 +17,6 @@ export const usePostStore = defineStore('post', () => {
       post.value?.replies.filter((reply) => reply.reply_id === parentReply.id)
   })
 
-  const route = useRoute()
-
   const fetchPosts = () =>
     useAsyncData('posts', async () => {
       let queryBuilder = supabase
@@ -37,6 +35,8 @@ export const usePostStore = defineStore('post', () => {
         .order('created_at', { ascending: false })
         .limit(20)
 
+      const route = useRoute()
+
       if (route.query.search) {
         queryBuilder = queryBuilder.textSearch(
           'title_content_keywords',
@@ -48,8 +48,6 @@ export const usePostStore = defineStore('post', () => {
       }
 
       if (route.name?.toString().startsWith('MyPosts')) {
-        console.log('oe')
-
         queryBuilder = queryBuilder.eq('author_id', user.value?.id ?? '')
       }
 

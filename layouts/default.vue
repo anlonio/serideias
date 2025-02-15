@@ -81,7 +81,6 @@
 import { useDisplay } from 'vuetify'
 
 const authStore = useAuthStore()
-const postStore = usePostStore()
 const { isAnon, profile } = storeToRefs(authStore)
 
 const railToggle = ref(true)
