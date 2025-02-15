@@ -9,7 +9,12 @@
                 <span class="text-h4">Editar Perfil</span>
               </template>
               <template #append>
-                <template v-if="avatarUrl.value.value || profile?.avatar_url">
+                <template
+                  v-if="
+                    avatarUrl.value.value !== null &&
+                    (previewAvatar || profile?.avatar_url)
+                  "
+                >
                   <VBtn
                     append-icon="mdi-pencil"
                     variant="plain"
@@ -125,13 +130,16 @@ const { locations } = storeToRefs(postStore)
 const { profile, user } = storeToRefs(authStore)
 
 const { status } = postStore.fetchLocations()
-await authStore.fetchProfile(user.value?.id ?? '')
+await useAsyncData(
+  'profile',
+  async () => await authStore.fetchProfile(user.value?.id ?? ''),
+)
 
 const { file, open } = useFileSystemAccess({
   types: [
     {
       accept: {
-        'images/*': ['.png'],
+        'images/*': ['.png', '.jpeg', '.jpg'],
       },
     },
   ],

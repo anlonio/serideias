@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid'
+
 export const useAuthStore = defineStore('auth', () => {
   const supabase = useSupabaseClient<Database>()
   const session = useSupabaseSession()
@@ -24,28 +26,28 @@ export const useAuthStore = defineStore('auth', () => {
 
   const profile = ref<ProfilesRow | null>(null)
 
-  const fetchProfile = (id: string) => {
-    return useAsyncData('profile', async () =>
-      supabase
-        .from('profiles')
-        .select(
-          `
+  const fetchProfile = (id: string) =>
+    supabase
+      .from('profiles')
+      .select(
+        `
         *,
         location:locations(*)
         `,
-        )
-        .eq('id', id)
-        .maybeSingle()
-        .then((profileDB) => {
-          profile.value = profileDB.data
-          return profileDB.data
-        }),
-    )
-  }
+      )
+      .eq('id', id)
+      .maybeSingle()
+      .then((profileDB) => {
+        profile.value = profileDB.data
+        return profileDB.data
+      })
 
   watchEffect(() => {
     if (user.value) {
-      return fetchProfile(user.value.id)
+      if (user.value.id !== profile.value?.id) {
+        fetchProfile(user.value.id)
+      }
+      return
     }
     profile.value = null
   })
@@ -77,7 +79,7 @@ export const useAuthStore = defineStore('auth', () => {
       throw Error('booooo')
     }
 
-    const path = profile.value.avatar_url?.split('/').pop()
+    const path = profile.value.avatar_url?.split('avatar/').pop()
 
     if (!avatar_url && path) {
       return supabase.storage
@@ -98,7 +100,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const result = await supabase.storage
       .from('avatar')
-      .upload(`${profile.value.id}.${ext}`, avatar_url)
+      .upload(`${profile.value.id}/${uuid()}.${ext}`, avatar_url)
     if (result.error) {
       throw Error('something went wrong with image upload')
     }
@@ -127,7 +129,10 @@ export const useAuthStore = defineStore('auth', () => {
       .from('profiles')
       .update(data)
       .eq('id', profile.value.id)
-      .select()
+      .then(() => {
+        fetchProfile(profile.value?.id ?? '')
+        return true
+      })
   }
 
   const checkUsername = async (username: string) => {
