@@ -54,13 +54,15 @@
             <VCol>
               <VForm ref="replyForm" @submit.prevent="onSubmit">
                 <input id="submitForm" type="submit" hidden />
-                <VTextField
+                <VTextarea
                   v-model="replyContent.value.value"
                   :error-messages="replyContent.errors.value"
                   placeholder="Comentar algo sobre"
                   variant="filled"
                   counter
-                  maxlength="200"
+                  auto-grow
+                  rows="1"
+                  maxlength="500"
                   :loading="loading"
                 >
                   <template #append-inner>
@@ -72,7 +74,7 @@
                       @click="replyForm?.requestSubmit()"
                     />
                   </template>
-                </VTextField>
+                </VTextarea>
               </VForm>
             </VCol>
           </VRow>

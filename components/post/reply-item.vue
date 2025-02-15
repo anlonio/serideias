@@ -58,14 +58,16 @@
               <template #actions>
                 <PostVotesItem :reply-id="reply.id" />
                 <input id="submitForm" type="submit" hidden />
-                <VTextField
+                <VTextarea
                   v-if="showInput"
                   v-model="replyContent.value.value"
                   autofocus
                   :error-messages="replyContent.errors.value"
                   :loading="loading"
                   counter
-                  maxlength="200"
+                  maxlength="500"
+                  rows="1"
+                  auto-grow
                   hide-details
                   density="compact"
                   :placeholder="`Responder @${reply.author.username}`"
@@ -83,7 +85,7 @@
                       @click="replyForm?.requestSubmit()"
                     />
                   </template>
-                </VTextField>
+                </VTextarea>
                 <VBtn
                   v-else
                   prepend-icon="mdi-comment-outline"
