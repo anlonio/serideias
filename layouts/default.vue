@@ -12,7 +12,7 @@
             v-if="profile"
             :subtitle="`@${profile.username}`"
             :title="profile.full_name"
-            to="/posts/my-posts"
+            @click="$router.push('/posts/my-posts')"
           >
             <template #prepend>
               <VIcon

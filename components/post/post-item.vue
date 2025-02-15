@@ -1,6 +1,7 @@
 <template>
   <VMainCard
-    class="mx-auto"
+    class="mx-auto d-flex flex-column"
+    height="300px"
     hover
     @click="$router.push({ path: `/posts/${post.uuid}` })"
   >
@@ -42,43 +43,50 @@
       </VDialog>
     </VCardTitle>
     <VCardSubtitle> {{ createdAt }} </VCardSubtitle>
-    <VCardText class="flex-wrap">
+    <VCardText class="flex-grow-1 overflow-y-hidden">
       <VuetifyViewer
         markdown-theme="github"
         :value="post.content"
       ></VuetifyViewer>
-      <VChipGroup>
-        <VChip v-if="post.location" prepend-icon="mdi-map-marker">{{
-          post.location.name
-        }}</VChip>
-        <VChip v-for="keyword in post.keywords" :key="keyword">
-          {{ keyword }}
-        </VChip>
-      </VChipGroup>
+      <br />
     </VCardText>
     <VCardActions>
-      <v-list-item class="w-100">
-        <template v-if="$vuetify.display.smAndUp" #prepend>
-          <v-avatar color="grey-darken-3" />
-        </template>
+      <VContainer>
+        <VRow>
+          <VChipGroup>
+            <VChip v-if="post.location" prepend-icon="mdi-map-marker">{{
+              post.location.name
+            }}</VChip>
+            <VChip v-for="keyword in post.keywords" :key="keyword">
+              {{ keyword }}
+            </VChip>
+          </VChipGroup>
+        </VRow>
+        <VRow>
+          <v-list-item class="w-100">
+            <template v-if="$vuetify.display.smAndUp" #prepend>
+              <v-avatar color="grey-darken-3" />
+            </template>
 
-        <v-list-item-title>{{ post.author.full_name }}</v-list-item-title>
+            <v-list-item-title>{{ post.author.full_name }}</v-list-item-title>
 
-        <v-list-item-subtitle>
-          @{{ post.author.username }}
-        </v-list-item-subtitle>
-        <template #append>
-          <div>
-            <v-icon class="me-1" :icon="getVotesIcon" />
-            <span class="subheading me-2">{{ totalVotes }}</span>
-            <span class="me-1">·</span>
-            <v-icon class="me-1" icon="mdi-comment" />
-            <span class="subheading">{{
-              post.totalReplies[0].count ?? 0
-            }}</span>
-          </div>
-        </template>
-      </v-list-item>
+            <v-list-item-subtitle>
+              @{{ post.author.username }}
+            </v-list-item-subtitle>
+            <template #append>
+              <div>
+                <v-icon class="me-1" :icon="getVotesIcon" />
+                <span class="subheading me-2">{{ totalVotes }}</span>
+                <span class="me-1">·</span>
+                <v-icon class="me-1" icon="mdi-comment" />
+                <span class="subheading">{{
+                  post.totalReplies[0].count ?? 0
+                }}</span>
+              </div>
+            </template>
+          </v-list-item>
+        </VRow>
+      </VContainer>
     </VCardActions>
   </VMainCard>
 </template>
