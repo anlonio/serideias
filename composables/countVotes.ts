@@ -15,11 +15,12 @@ export const useCountVotes = () => {
     postId?: number
     replyId?: number
   }) => {
-    const result = await postStore.fetchVotes({ postId, replyId })
+    const { data } = await postStore.fetchVotes({ postId, replyId })
+    if (!data.value) throw 'boo'
     firstLoad.value = false
-    upVote.value = result.upVote
-    downVote.value = result.downVote
-    myVote.value = result.myVote
+    upVote.value = data.value.upVote
+    downVote.value = data.value.downVote
+    myVote.value = data.value.myVote
   }
   return { upVote, downVote, myVote, firstLoad, totalVotes, getVotes }
 }

@@ -64,7 +64,13 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      exclude: ['/', '/register', '/api/*'],
+      exclude: [
+        '/',
+        '/register',
+        '/forgot-password',
+        '/new-password',
+        '/api/*',
+      ],
     },
   },
   snackbar: {

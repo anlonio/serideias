@@ -1,4 +1,12 @@
 {
+  "supabase": {
+    "errors": {
+      "invalid_credentials": "Credenciais incorretas",
+      "user_already_exists": "Email já registrados no sistema",
+      "over_email_send_rate_limit": "Limite de e-mails enviados atingido",
+      "otp_expired": "Link de e-mail inválido ou expirado"
+    }
+  },
   "zodI18n": {
     "errors": {
       "custom": "Entrada inválida",

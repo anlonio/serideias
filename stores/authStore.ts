@@ -4,6 +4,18 @@ export const useAuthStore = defineStore('auth', () => {
   const user = useSupabaseUser()
   const router = useRouter()
 
+  const getURL = () => {
+    let url =
+      process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+      process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+      'http://localhost:3000/'
+    // Make sure to include `https://` when not localhost.
+    url = url.startsWith('http') ? url : `https://${url}`
+    // Make sure to include a trailing `/`.
+    url = url.endsWith('/') ? url : `${url}/`
+    return url
+  }
+
   supabase.auth.onAuthStateChange((event) => {
     if (event === 'SIGNED_OUT') {
       router.push('/')
@@ -83,6 +95,14 @@ export const useAuthStore = defineStore('auth', () => {
     return count !== 0
   }
 
+  const forgotPassword = (email: string) =>
+    supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${getURL()}new-password`,
+    })
+
+  const newPassword = (password: string) =>
+    supabase.auth.updateUser({ password })
+
   return {
     signUp,
     signIn,
@@ -94,6 +114,8 @@ export const useAuthStore = defineStore('auth', () => {
     fetchProfile,
     updateProfile,
     checkUsername,
+    forgotPassword,
+    newPassword,
   }
 })
 

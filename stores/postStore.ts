@@ -5,6 +5,7 @@ export const usePostStore = defineStore('post', () => {
 
   const posts = ref<PostsRowFull[]>([])
   const post = ref<PostsRowFullWithReplies | null>(null)
+  const locationsWithPosts = ref<LocationsRowWithPosts[]>([])
 
   const rootReplies = computed(() => {
     return post.value?.replies.filter((reply) => !reply.reply_id)
@@ -15,14 +16,14 @@ export const usePostStore = defineStore('post', () => {
       post.value?.replies.filter((reply) => reply.reply_id === parentReply.id)
   })
 
-  const fetchPosts = (options = {}) => {
-    const result = useAsyncData(
-      'posts',
-      async () =>
-        await supabase
-          .from('posts')
-          .select(
-            `
+  const route = useRoute()
+
+  const fetchPosts = () =>
+    useAsyncData('posts', async () => {
+      let queryBuilder = supabase
+        .from('posts')
+        .select(
+          `
             *,
             author:profiles(
               *,
@@ -31,21 +32,57 @@ export const usePostStore = defineStore('post', () => {
               totalReplies:replies(count),
             location:locations(*)
             `,
-          )
-          .order('created_at', { ascending: false })
-          .limit(20),
-      options,
-    )
-    result.then((result) => {
-      const postsData = result.data.value?.data
-      if (postsData) {
-        posts.value = postsData
+        )
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      if (route.query.search) {
+        queryBuilder = queryBuilder.textSearch(
+          'title_content_keywords',
+          route.query.search?.toString(),
+          {
+            type: 'websearch',
+          },
+        )
       }
-      return result
+      return await queryBuilder.then((result) => {
+        const postsData = result.data
+        if (postsData) {
+          posts.value = postsData
+        }
+        console.log(result.error)
+
+        return result
+      })
     })
 
-    return result
-  }
+  const fetchPostsFromLocations = () =>
+    useAsyncData(
+      'posts',
+      async () =>
+        await supabase
+          .from('locations')
+          .select(
+            `
+              *,
+              posts(count),
+              profiles(count)
+              `,
+          )
+          .order('name', { ascending: true })
+          .then((result) => {
+            if (result.data) {
+              locationsWithPosts.value = result.data.sort((a, b) => {
+                const countA = a.posts[0]?.count || 0
+                const countB = b.posts[0]?.count || 0
+                return countB - countA
+              })
+            }
+            console.log(result.error)
+
+            return result
+          }),
+    )
 
   const fetchPost = () => {
     const route = useRoute()
@@ -105,36 +142,38 @@ export const usePostStore = defineStore('post', () => {
 
     const fieldId = postId ? 'post_id' : 'reply_id'
 
-    const { count: upVote } = await supabase
-      .from('votes')
-      .select('*', { count: 'exact', head: true })
-      .eq(fieldId, itemId)
-      .eq('is_upvote', true)
-
-    const { count: downVote } = await supabase
-      .from('votes')
-      .select('*', { count: 'exact', head: true })
-      .eq(fieldId, itemId)
-      .eq('is_upvote', false)
-
-    let myVote = null
-
-    if (authStore.profile) {
-      const { data } = await supabase
+    return useAsyncData('votes', async () => {
+      const { count: upVote } = await supabase
         .from('votes')
-        .select('*')
-        .eq('author_id', authStore.profile.id)
+        .select('*', { count: 'exact', head: true })
         .eq(fieldId, itemId)
-        .maybeSingle()
+        .eq('is_upvote', true)
 
-      if (data) myVote = data
-    }
+      const { count: downVote } = await supabase
+        .from('votes')
+        .select('*', { count: 'exact', head: true })
+        .eq(fieldId, itemId)
+        .eq('is_upvote', false)
 
-    return {
-      upVote: upVote ?? 0,
-      downVote: downVote ?? 0,
-      myVote,
-    }
+      let myVote = null
+
+      if (authStore.profile) {
+        const { data } = await supabase
+          .from('votes')
+          .select('*')
+          .eq('author_id', authStore.profile.id)
+          .eq(fieldId, itemId)
+          .maybeSingle()
+
+        if (data) myVote = data
+      }
+
+      return {
+        upVote: upVote ?? 0,
+        downVote: downVote ?? 0,
+        myVote,
+      }
+    })
   }
 
   const createPost = (post: NewPost) => {
@@ -224,6 +263,8 @@ export const usePostStore = defineStore('post', () => {
     replyPost,
     saveVote,
     locations,
+    fetchPostsFromLocations,
+    locationsWithPosts,
   }
 })
 

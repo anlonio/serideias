@@ -22,6 +22,10 @@ export type RepliesRow = DatabaseTables['replies']['Row'] & {
   author: ProfilesRow
 }
 export type LocationsRow = DatabaseTables['locations']['Row']
+export type LocationsRowWithPosts = DatabaseTables['locations']['Row'] & {
+  posts: { count: number }[]
+  profiles: { count: number }[]
+}
 
 export type VotesRow = DatabaseTables['votes']['Row']
 

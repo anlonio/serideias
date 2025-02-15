@@ -3,6 +3,7 @@
     <VApp>
       <VNavigationDrawer
         v-model:rail="railToggle"
+        v-model="drawerToggle"
         :expand-on-hover="expandOnHoverActive"
         mobile-breakpoint="md"
       >
@@ -38,7 +39,7 @@
             />
             <VListItem
               to="/posts/city"
-              title="Posts por cidade"
+              title="Resumo por cidade"
               prepend-icon="mdi-folder-marker"
             />
             <VListItem
@@ -65,7 +66,22 @@
         <template #prepend>
           <v-app-bar-nav-icon @click="setNavigationDrawer" />
         </template>
-        <VAppBarTitle>Serideias</VAppBarTitle>
+        <VAppBarTitle v-if="$vuetify.display.smAndUp">Serideias</VAppBarTitle>
+        <VTextField
+          v-model="searchText"
+          label="Pesquisar por publicações"
+          density="compact"
+          append-inner-icon="mdi-magnify"
+          hide-details
+          variant="solo-filled"
+          single-line
+          flat
+          max-width="320px"
+          clearable
+          @click:clear="search"
+          @click:append-inner="search"
+          @keydown.enter="search"
+        />
         <template #append>
           <slot name="toolbar-append" />
           <VBtn v-if="isAnon" color="info" to="/login">fazer login</VBtn>
@@ -77,17 +93,37 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify'
+
 const authStore = useAuthStore()
+const postStore = usePostStore()
 const { isAnon, profile } = storeToRefs(authStore)
 
 const railToggle = ref(true)
 const drawerToggle = ref(false)
 const expandOnHoverActive = ref(true)
 
+const display = useDisplay()
+
+watch(
+  display.xs,
+  (value) => {
+    expandOnHoverActive.value = !value
+    railToggle.value = !value
+  },
+  {
+    immediate: true,
+  },
+)
+
 const setNavigationDrawer = () => {
+  if (display.xs.value) {
+    drawerToggle.value = !drawerToggle.value
+    return
+  }
   expandOnHoverActive.value = !expandOnHoverActive.value
-  drawerToggle.value = true
   railToggle.value = !railToggle.value
+  drawerToggle.value = true
 }
 
 const signOut = async () => {
@@ -96,6 +132,28 @@ const signOut = async () => {
     console.log(error)
   }
 }
+
+const route = useRoute()
+
+watch(
+  () => route.query,
+  () => {
+    postStore.fetchPosts()
+  },
+  {
+    deep: true,
+  },
+)
+
+const searchText = ref('')
+
+if (route.query.search) {
+  searchText.value = route.query.search.toString()
+}
+
+const router = useRouter()
+const search = () =>
+  router.push({ path: '/', query: { search: searchText.value } })
 </script>
 
 <style></style>

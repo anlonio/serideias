@@ -6,27 +6,9 @@
           <VSheet elevation="1" class="pa-4">
             <VForm @submit.prevent="onSubmit">
               <VContainer>
-                <h1>Criar Conta</h1>
+                <h1>Nova senha</h1>
                 <VRow align="center" class="pt-4">
                   <VCol class="text-end">
-                    <VTextField
-                      v-model="fullName.value.value"
-                      :error-messages="fullName.errors.value"
-                      label="Seu nome"
-                    />
-                    <VTextField
-                      v-model="username.value.value"
-                      :error-messages="username.errors.value"
-                      label="Seu usuário"
-                      type="email"
-                      prefix="@"
-                    />
-                    <VTextField
-                      v-model="email.value.value"
-                      :error-messages="email.errors.value"
-                      label="Email"
-                      type="email"
-                    />
                     <VTextField
                       v-model="password.value.value"
                       :error-messages="password.errors.value"
@@ -39,19 +21,14 @@
                       label="Confirme a Senha"
                       type="password"
                     />
-                    <VRow class="pt-4">
-                      <VBtn class="mr-4" variant="text" to="/forgot-password"
-                        >Esqueci a senha</VBtn
-                      >
-                      <VSpacer />
-                      <VBtn color="info" class="mr-4" variant="text" to="/login"
-                        >Fazer Login</VBtn
-                      >
-                      <VBtn color="success" type="submit" :loading="loading"
-                        >Cadastrar</VBtn
-                      >
-                    </VRow>
                   </VCol>
+                </VRow>
+                <VRow class="pt-4">
+                  <VBtn class="mr-4" variant="text">Fazer login</VBtn>
+                  <VSpacer />
+                  <VBtn color="success" type="submit" :loading="loading">
+                    Solicitar e-mail
+                  </VBtn>
                 </VRow>
               </VContainer>
             </VForm>
@@ -72,15 +49,11 @@ definePageMeta({
 })
 
 const { handleSubmit } = useForm({
-  validationSchema: toTypedSchema(signUpUserSchema),
+  validationSchema: toTypedSchema(newPasswordSchema),
 })
 
-const email = useField('email')
 const password = useField('password.password')
 const confirmPassword = useField('password.confirmPassword')
-
-const username = useField<string>('username')
-const fullName = useField('fullName')
 
 const authStore = useAuthStore()
 
@@ -88,33 +61,42 @@ const loading = ref(false)
 const snackbar = useSnackbar()
 const { t } = useI18n()
 
+const route = useRoute()
+
+const hashParams = new URLSearchParams(route.hash)
+
+if (hashParams.get('error_code')) {
+  snackbar.add({
+    text: t(`supabase.errors.${hashParams.get('error_code')}`),
+    type: 'error',
+    title: 'Erro ao cadastrar nova senha',
+  })
+}
+
 const onSubmit = handleSubmit(async (data) => {
   try {
-    if (await authStore.checkUsername(username.value.value)) {
-      return username.setErrors('Usuário já existe')
-    }
     loading.value = true
-    const { error } = await authStore.signUp(data)
+    const { error } = await authStore.newPassword(data.password)
     if (error) {
       snackbar.add({
         text: t(`supabase.errors.${error.code}`),
         type: 'error',
-        title: 'Erro no cadastro',
+        title: 'Erro ao cadastrar nova senha',
       })
       return
     }
 
     snackbar.add({
-      text: 'Você receberá um e-mail de confirmação, confira a caixa de entrada do email cadastrado',
+      text: 'Sua nova senha foi cadastrada',
       type: 'success',
-      title: 'Cadastro realizado',
+      title: 'Cadastro feito com sucesso',
     })
   } catch (error) {
     console.error(error)
     snackbar.add({
       text: 'Erro no sistema. Contate o administrador',
       type: 'error',
-      title: 'Erro no cadastro',
+      title: 'Erro ao cadastrar nova senha',
     })
   } finally {
     loading.value = false
