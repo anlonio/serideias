@@ -47,12 +47,12 @@
       </VContainer>
       <VContainer v-else>
         <VRow justify="center">
-          <VCol sm="12" md="10" lg="4" xl="5">
+          <VCol sm="10" md="10" lg="6" xl="5">
             <VBtn color="success" block to="/posts/new"> Nova publicação </VBtn>
           </VCol>
         </VRow>
         <VRow justify="center">
-          <VCol sm="12" md="10" lg="4" xl="5">
+          <VCol sm="10" md="10" lg="6" xl="5">
             <SkeletonPostCard />
           </VCol>
         </VRow>
@@ -73,8 +73,6 @@ const { status, execute } = useAsyncData(
   'posts',
   async () => await postStore.fetchPosts(),
 )
-
-const loadPosts = () => {}
 
 const route = useRoute()
 

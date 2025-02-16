@@ -56,7 +56,7 @@
                 />
               </template>
               <template #actions>
-                <PostVotesItem :reply-id="reply.id" />
+                <PostVotesItem :reply="reply" />
                 <input id="submitForm" type="submit" hidden />
                 <VTextarea
                   v-if="showInput"

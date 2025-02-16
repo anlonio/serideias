@@ -13,7 +13,7 @@
               <ProfileItem :author="post.author" :created-at="post.created_at">
                 <template #append>
                   <VRow class="gc-2">
-                    <PostVotesItem :post-id="post.id" />
+                    <PostVotesItem :post="post" />
                   </VRow>
                 </template>
               </ProfileItem>
@@ -45,9 +45,7 @@
           </VRow>
           <VRow>
             <VCol>
-              <span class="text-h5"
-                >Respostas ({{ post.totalReplies[0].count }})</span
-              >
+              <span class="text-h5">Respostas ({{ post.totalReplies }})</span>
             </VCol>
           </VRow>
           <VRow>

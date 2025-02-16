@@ -83,9 +83,7 @@
                 <span class="subheading me-2">{{ totalVotes }}</span>
                 <span class="me-1">·</span>
                 <v-icon class="me-1" icon="mdi-comment" />
-                <span class="subheading">{{
-                  post.totalReplies[0].count ?? 0
-                }}</span>
+                <span class="subheading">{{ post.totalReplies }}</span>
               </div>
             </template>
           </v-list-item>
@@ -103,11 +101,9 @@ const { profile } = storeToRefs(authStore)
 
 const { post } = defineProps<{ post: PostsRowFull }>()
 
-const { totalVotes, getVotes } = useCountVotes()
+const totalVotes = computed(() => post.upVotes - post.downVotes)
 
 const deleteDialog = ref(false)
-
-getVotes({ postId: post.id })
 
 const getVotesIcon = computed(() => {
   return totalVotes.value >= 0 ? 'mdi-arrow-up-bold' : 'mdi-arrow-down-bold'

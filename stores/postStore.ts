@@ -17,6 +17,18 @@ export const usePostStore = defineStore('post', () => {
       post.value?.replies.filter((reply) => reply.reply_id === parentReply.id)
   })
 
+  // @ts-expect-error complex item param type, will do it later
+  const convertCounts = (item) => {
+    return {
+      ...item,
+      totalReplies: item.totalReplies[0].count,
+      upVotes: item.upVotes[0].count,
+      downVotes: item.downVotes[0].count,
+      myVote: item.myVote[0],
+      ...(item.replies && { replies: item.replies.map(convertCounts) }),
+    }
+  }
+
   const fetchPosts = async () => {
     let queryBuilder = supabase
       .from('posts')
@@ -28,12 +40,21 @@ export const usePostStore = defineStore('post', () => {
             location: locations(*),
             contacts(*)
             ),
-            totalReplies:replies(count),
-          location:locations(*)
+          totalReplies:replies(count),
+          location:locations(*),
+          upVotes:votes(count),
+          downVotes:votes(count),
+          myVote:votes(*)
           `,
       )
-      .order('created_at', { ascending: false })
-      .limit(20)
+      .eq('upVotes.is_upvote', true)
+      .eq('downVotes.is_upvote', false)
+
+    if (user.value) {
+      queryBuilder = queryBuilder.eq('myVote.author_id', user.value?.id)
+    } else {
+      queryBuilder = queryBuilder.is('myVote.author_id', null)
+    }
 
     const route = useRoute()
 
@@ -51,14 +72,17 @@ export const usePostStore = defineStore('post', () => {
       queryBuilder = queryBuilder.eq('author_id', user.value?.id ?? '')
     }
 
-    return await queryBuilder.then((result) => {
-      const postsData = result.data
-      if (postsData) {
-        posts.value = postsData
-      }
+    return await queryBuilder
+      .order('created_at', { ascending: false })
+      .limit(20)
+      .then((result) => {
+        const postsData = result.data
+        if (postsData) {
+          posts.value = postsData.map(convertCounts)
+        }
 
-      return result
-    })
+        return result
+      })
   }
 
   const fetchPostsFromLocations = async () =>
@@ -88,34 +112,58 @@ export const usePostStore = defineStore('post', () => {
     const route = useRoute()
     const uuid = route.params.uuid.toString()
 
-    return supabase
+    let queryBuilder = supabase
       .from('posts')
       .select(
         `
-      *,
-      author:profiles(
-        *,
-        location: locations(*),
-        contacts(*)
-      ),
-      replies(
         *,
         author:profiles(
           *,
           location: locations(*),
           contacts(*)
-        ) 
-      ),
-      totalReplies:replies(count),
-      location:locations(*)
-    `,
+        ),
+        replies(
+          *,
+          author:profiles(
+            *,
+            location: locations(*),
+            contacts(*)
+          ),
+          upVotes:votes(count),
+          downVotes:votes(count),
+          myVote:votes(*),
+          totalReplies:replies(count)
+        ),
+        totalReplies:replies(count),
+        upVotes:votes(count),
+        downVotes:votes(count),
+        myVote:votes(*),
+        location:locations(*)
+      `,
       )
       .eq('uuid', uuid)
+      .eq('upVotes.is_upvote', true)
+      .eq('downVotes.is_upvote', false)
+      .eq('replies.upVotes.is_upvote', true)
+      .eq('replies.downVotes.is_upvote', false)
+
+    if (user.value) {
+      queryBuilder = queryBuilder
+        .eq('myVote.author_id', user.value?.id)
+        .eq('replies.myVote.author_id', user.value?.id)
+    } else {
+      queryBuilder = queryBuilder
+        .is('myVote.author_id', null)
+        .is('replies.myVote.author_id', null)
+    }
+
+    return queryBuilder
       .order('created_at', { ascending: false, referencedTable: 'replies' })
-      .maybeSingle()
+      .single()
       .then((result) => {
-        const postData = result.data
-        if (postData) {
+        if (result.data) {
+          const postData = convertCounts(result.data)
+
           post.value = postData
         }
         return result
@@ -135,37 +183,33 @@ export const usePostStore = defineStore('post', () => {
       throw 'boooooo'
     }
 
-    const fieldId = postId ? 'post_id' : 'reply_id'
+    const from = postId ? 'posts' : 'replies'
 
-    const { count: upVote } = await supabase
-      .from('votes')
-      .select('*', { count: 'exact', head: true })
-      .eq(fieldId, itemId)
-      .eq('is_upvote', true)
-
-    const { count: downVote } = await supabase
-      .from('votes')
-      .select('*', { count: 'exact', head: true })
-      .eq(fieldId, itemId)
-      .eq('is_upvote', false)
-
-    let myVote = null
+    let queryBuilder = supabase
+      .from(from)
+      .select(
+        `
+          upVotes:votes(count),
+          downVotes:votes(count),
+          myVote:votes(*)
+      `,
+      )
+      .eq('id', itemId)
+      .eq('upVotes.is_upvote', true)
+      .eq('downVotes.is_upvote', false)
 
     if (user.value) {
-      const { data } = await supabase
-        .from('votes')
-        .select('*')
-        .eq('author_id', user.value.id)
-        .eq(fieldId, itemId)
-        .maybeSingle()
-
-      if (data) myVote = data
+      queryBuilder = queryBuilder.eq('myVote.author_id', user.value?.id)
+    } else {
+      queryBuilder = queryBuilder.is('myVote.author_id', null)
     }
 
+    const result = await queryBuilder.single()
+
     return {
-      upVote: upVote ?? 0,
-      downVote: downVote ?? 0,
-      myVote,
+      upVote: result.data?.upVotes[0].count ?? 0,
+      downVote: result.data?.downVotes[0].count ?? 0,
+      myVote: result.data?.myVote[0] ?? null,
     }
   }
 
@@ -196,16 +240,24 @@ export const usePostStore = defineStore('post', () => {
     if (!user.value) return
 
     if (upVote === undefined) {
-      return supabase
+      let queryBuilder = supabase
         .from('votes')
         .delete()
         .eq('author_id', user.value.id)
-        .then((result) => {
-          if (result.error) {
-            throw result.error
-          }
-          return result
-        })
+
+      if (post_id) {
+        queryBuilder = queryBuilder.eq('post_id', post_id)
+      }
+      if (reply_id) {
+        queryBuilder = queryBuilder.eq('reply_id', reply_id)
+      }
+
+      return queryBuilder.then((result) => {
+        if (result.error) {
+          throw result.error
+        }
+        return result
+      })
     }
 
     return supabase
