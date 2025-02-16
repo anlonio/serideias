@@ -42,6 +42,20 @@
                 <PostItem :post="post" />
               </VCol>
             </VRow>
+            <VRow
+              v-if="infiniteScrollActive"
+              class="text-center mb-4"
+              align="center"
+            >
+              <VCol>
+                <span
+                  >Acabamos aqui.
+                  <VBtn class="text-none" color="info" slim @click="execute"
+                    >Recarregar</VBtn
+                  >
+                </span>
+              </VCol>
+            </VRow>
           </VCol>
         </VRow>
       </VContainer>
@@ -57,6 +71,13 @@
           </VCol>
         </VRow>
       </VContainer>
+      <VProgressLinear
+        v-if="isLoading"
+        indeterminate
+        location="bottom"
+        color="info"
+        absolute
+      />
     </VMain>
   </NuxtLayout>
 </template>
@@ -74,17 +95,41 @@ const { status, execute } = useAsyncData(
   async () => await postStore.fetchPosts(),
 )
 
-const route = useRoute()
+const infiniteScrollActive = ref(false)
 
 watch(
-  () => route.query,
-  () => {
-    postStore.fetchPosts()
+  status,
+  (value) => {
+    if (value === 'success') {
+      return (infiniteScrollActive.value = true)
+    }
+    infiniteScrollActive.value = false
   },
   {
-    deep: true,
+    immediate: true,
   },
 )
+
+const loadPosts = async () => {
+  console.log('here')
+
+  const { data } = await postStore.fetchPosts({ nextPage: true })
+  if (data?.length === 0) {
+    infiniteScrollActive.value = false
+  } else {
+    infiniteScrollActive.value = true
+  }
+}
+const { isLoading } = useInfiniteScroll(window, loadPosts, {
+  canLoadMore: () => infiniteScrollActive.value,
+  distance: 30,
+})
+
+const route = useRoute()
+
+watch(() => route.query, execute, {
+  deep: true,
+})
 
 const searchText = ref('')
 

@@ -29,7 +29,7 @@ export const usePostStore = defineStore('post', () => {
     }
   }
 
-  const fetchPosts = async () => {
+  const fetchPosts = async ({ nextPage }: { nextPage?: boolean } = {}) => {
     let queryBuilder = supabase
       .from('posts')
       .select(
@@ -72,17 +72,29 @@ export const usePostStore = defineStore('post', () => {
       queryBuilder = queryBuilder.eq('author_id', user.value?.id ?? '')
     }
 
-    return await queryBuilder
-      .order('created_at', { ascending: false })
-      .limit(20)
-      .then((result) => {
-        const postsData = result.data
-        if (postsData) {
-          posts.value = postsData.map(convertCounts)
-        }
+    if (nextPage) {
+      const count = posts.value.length
+      queryBuilder = queryBuilder.range(count, count + 19)
+    } else {
+      queryBuilder = queryBuilder.limit(20)
+    }
 
+    queryBuilder = queryBuilder.order('created_at', { ascending: false })
+
+    return await queryBuilder.then((result) => {
+      const postsData = result.data
+      if (!postsData) {
         return result
-      })
+      }
+
+      if (nextPage) {
+        posts.value.push(...postsData.map(convertCounts))
+        return result
+      }
+
+      posts.value = postsData.map(convertCounts)
+      return result
+    })
   }
 
   const fetchPostsFromLocations = async () =>
