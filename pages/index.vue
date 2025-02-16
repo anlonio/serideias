@@ -28,7 +28,7 @@
     </template>
     <VMain>
       <VContainer>
-        <VRow justify="space-between">
+        <VRow justify="space-between" justify-sm="center">
           <VCol v-if="!$vuetify.display.mdAndDown" xl="3"></VCol>
           <VCol sm="10" md="8" lg="6" xl="5">
             <template v-if="status === 'success'">
@@ -119,24 +119,22 @@
               </VRow>
             </template>
           </VCol>
-          <VCol lg="3" md="4" xl="3">
-            <template v-if="!$vuetify.display.smAndDown">
-              <span class="text-h5">Filtrar pro cidade:</span>
-              <VChipGroup
-                v-model="location"
-                column
-                selected-class="text-info"
-                @update:model-value="setLocation"
+          <VCol v-if="!$vuetify.display.smAndDown" lg="3" md="4" xl="3">
+            <span class="text-h5">Filtrar pro cidade:</span>
+            <VChipGroup
+              v-model="location"
+              column
+              selected-class="text-info"
+              @update:model-value="setLocation"
+            >
+              <VChip
+                v-for="loc in locations"
+                :key="loc.uuid"
+                filter
+                :value="loc.uuid"
+                >{{ loc.name }}</VChip
               >
-                <VChip
-                  v-for="loc in locations"
-                  :key="loc.uuid"
-                  filter
-                  :value="loc.uuid"
-                  >{{ loc.name }}</VChip
-                >
-              </VChipGroup>
-            </template>
+            </VChipGroup>
           </VCol>
         </VRow>
       </VContainer>
@@ -174,12 +172,12 @@ const setLocation = (location?: string) => {
   })
 }
 
-const { status, execute } = useAsyncData(
+const { status, execute } = await useAsyncData(
   'posts',
   async () => await postStore.fetchPosts(),
 )
 
-useAsyncData('locations', async () => await postStore.fetchLocations())
+await useAsyncData('locations', async () => await postStore.fetchLocations())
 
 const infiniteScrollActive = ref(false)
 
