@@ -1,13 +1,12 @@
 <template>
-  <VApp>
-    <slot />
-  </VApp>
+  <VResponsive>
+    <VApp>
+      <slot />
+    </VApp>
+  </VResponsive>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup></script>
 
-</script>
+<style></style>
 
-<style>
-
-</style>

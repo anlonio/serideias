@@ -125,14 +125,13 @@ export const useAuthStore = defineStore('auth', () => {
 
     data.avatar_url = await upsertAvatar(data.avatar_url)
 
-    return supabase
-      .from('profiles')
-      .update(data)
-      .eq('id', profile.value.id)
-      .then(() => {
-        fetchProfile(profile.value?.id ?? '')
-        return true
-      })
+    return (
+      supabase
+        .from('profiles')
+        // @ts-expect-error upsertAvatar function avoid File type to avatar_url
+        .update(data)
+        .eq('id', profile.value.id)
+    )
   }
 
   const checkUsername = async (username: string) => {

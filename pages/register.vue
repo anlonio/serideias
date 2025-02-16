@@ -87,6 +87,7 @@ const authStore = useAuthStore()
 const loading = ref(false)
 const snackbar = useSnackbar()
 const { t } = useI18n()
+const router = useRouter()
 
 const onSubmit = handleSubmit(async (data) => {
   try {
@@ -104,11 +105,7 @@ const onSubmit = handleSubmit(async (data) => {
       return
     }
 
-    snackbar.add({
-      text: 'Você receberá um e-mail de confirmação, confira a caixa de entrada do email cadastrado',
-      type: 'success',
-      title: 'Cadastro realizado',
-    })
+    router.push('/')
   } catch (error) {
     console.error(error)
     snackbar.add({

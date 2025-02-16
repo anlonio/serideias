@@ -1,8 +1,8 @@
 <template>
   <NuxtLayout>
     <NuxtPage />
-    <NuxtSnackbar />
   </NuxtLayout>
+  <NuxtSnackbar />
 </template>
 
 <script setup lang="ts">
