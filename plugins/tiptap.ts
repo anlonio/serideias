@@ -10,17 +10,13 @@ import {
   Color,
   Highlight,
   Heading,
-  TextAlign,
   FontFamily,
   FontSize,
   SubAndSuperScript,
   BulletList,
   OrderedList,
   TaskList,
-  Indent,
   Link,
-  Image,
-  Video,
   Table,
   Blockquote,
   HorizontalRule,
@@ -51,7 +47,6 @@ export default defineNuxtPlugin((app) => {
       Strike,
       Code.configure({ divider: true }),
       Heading,
-      TextAlign,
       FontFamily,
       FontSize,
       Color,
@@ -61,16 +56,7 @@ export default defineNuxtPlugin((app) => {
       BulletList,
       OrderedList,
       TaskList,
-      Indent.configure({ divider: true }),
       Link,
-      Image.configure({
-        upload(file: File) {
-          const url = URL.createObjectURL(file)
-          console.log('mock upload api :>> ', url)
-          return Promise.resolve(url)
-        },
-      }),
-      Video,
       Table.configure({ divider: true }),
       Blockquote,
       HorizontalRule,
@@ -78,7 +64,6 @@ export default defineNuxtPlugin((app) => {
       History.configure({ divider: true }),
     ],
   })
-
   app.vueApp.use(vuetifyProTipTap)
 })
 

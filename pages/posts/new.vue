@@ -4,7 +4,7 @@
       <h1 class="text-center">Nova Publicação</h1>
       <VContainer>
         <VRow justify="center">
-          <VCol sm="12" md="10" lg="4" xl="5">
+          <VCol sm="12" md="10" lg="8" xl="5">
             <VRow>
               <VCol>
                 <VTextField
@@ -67,6 +67,8 @@
 </template>
 
 <script lang="ts" setup>
+import { locale } from 'vuetify-pro-tiptap'
+
 const postStore = usePostStore()
 const authStore = useAuthStore()
 await postStore.fetchLocations()
@@ -116,6 +118,9 @@ const onSubmit = handleSubmit(async (post) => {
     loading.value = false
   }
 })
+
+locale.setMessage('ptBr', tipTapLocale)
+locale.setLang('ptBr')
 </script>
 
 <style></style>
