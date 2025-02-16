@@ -69,7 +69,12 @@ const postStore = usePostStore()
 
 const { posts } = storeToRefs(postStore)
 
-const { status, execute } = await postStore.fetchPosts()
+const { status, execute } = useAsyncData(
+  'posts',
+  async () => await postStore.fetchPosts(),
+)
+
+const loadPosts = () => {}
 
 const route = useRoute()
 

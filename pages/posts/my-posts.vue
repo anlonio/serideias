@@ -122,7 +122,10 @@ const { profile } = storeToRefs(authStore)
 
 const { posts } = storeToRefs(postStore)
 
-const { status, execute } = await postStore.fetchPosts()
+const { status, execute } = useAsyncData(
+  'my-posts',
+  async () => await postStore.fetchPosts(),
+)
 </script>
 
 <style></style>

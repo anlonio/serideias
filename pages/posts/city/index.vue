@@ -59,7 +59,10 @@ const postStore = usePostStore()
 
 const { locationsWithPosts } = storeToRefs(postStore)
 
-const { status, execute } = await postStore.fetchPostsFromLocations()
+const { status, execute } = useAsyncData(
+  'posts-from-locations',
+  async () => await postStore.fetchPostsFromLocations(),
+)
 </script>
 
 <style></style>
