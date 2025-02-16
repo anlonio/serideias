@@ -26,7 +26,8 @@ export const usePostStore = defineStore('post', () => {
             *,
             author:profiles(
               *,
-              location: locations(*)
+              location: locations(*),
+              contacts(*)
               ),
               totalReplies:replies(count),
             location:locations(*)
@@ -102,13 +103,15 @@ export const usePostStore = defineStore('post', () => {
         *,
         author:profiles(
           *,
-          location: locations(*)
+          location: locations(*),
+          contacts(*)
         ),
         replies(
           *,
           author:profiles(
             *,
-            location: locations(*)
+            location: locations(*),
+            contacts(*)
           ) 
         ),
         totalReplies:replies(count),

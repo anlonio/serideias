@@ -30,6 +30,9 @@ export default defineNuxtPlugin((app) => {
       VAutocomplete: {
         variant: 'outlined',
       },
+      VSelect: {
+        variant: 'outlined',
+      },
       VCombobox: {
         variant: 'outlined',
       },

@@ -26,26 +26,31 @@ export const useAuthStore = defineStore('auth', () => {
 
   const profile = ref<ProfilesRow | null>(null)
 
-  const fetchProfile = (id: string) =>
-    supabase
+  const fetchProfile = () => {
+    if (!user.value) {
+      throw Error('boooo')
+    }
+    return supabase
       .from('profiles')
       .select(
         `
         *,
-        location:locations(*)
+        location:locations(*),
+        contacts(*)
         `,
       )
-      .eq('id', id)
+      .eq('id', user.value.id)
       .maybeSingle()
       .then((profileDB) => {
         profile.value = profileDB.data
         return profileDB.data
       })
+  }
 
   watchEffect(() => {
     if (user.value) {
       if (user.value.id !== profile.value?.id) {
-        fetchProfile(user.value.id)
+        fetchProfile()
       }
       return
     }
@@ -152,6 +157,11 @@ export const useAuthStore = defineStore('auth', () => {
   const newPassword = (password: string) =>
     supabase.auth.updateUser({ password })
 
+  const removeContact = (id: number) =>
+    supabase.from('contacts').delete().eq('id', id)
+
+  const addContact = (data: Contact) => supabase.from('contacts').insert(data)
+
   return {
     signUp,
     signIn,
@@ -165,6 +175,8 @@ export const useAuthStore = defineStore('auth', () => {
     checkUsername,
     forgotPassword,
     newPassword,
+    removeContact,
+    addContact,
   }
 })
 

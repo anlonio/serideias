@@ -8,7 +8,7 @@
               <template #title>
                 <span class="text-h4">Editar Perfil</span>
               </template>
-              <template #append>
+              <template v-if="!$vuetify.display.xs" #append>
                 <template
                   v-if="
                     avatarUrl.value.value !== null &&
@@ -50,6 +50,71 @@
                 <VAvatar v-else size="80" image="/public/account-circle.png" />
               </template>
               <template #text>
+                <template v-if="$vuetify.display.xs">
+                  <VRow>
+                    <VDivider></VDivider>
+                    <VCol>
+                      <VListSubheader class="text-h6">
+                        Foto de perfil
+                      </VListSubheader>
+                    </VCol>
+                  </VRow>
+                  <VRow>
+                    <VCol>
+                      <VAvatar
+                        v-if="
+                          avatarUrl.value.value !== null &&
+                          (previewAvatar || profile?.avatar_url)
+                        "
+                        size="80"
+                        :image="(previewAvatar || profile?.avatar_url) ?? ''"
+                      >
+                      </VAvatar>
+                      <VAvatar
+                        v-else
+                        size="80"
+                        image="/public/account-circle.png"
+                      />
+                      <template
+                        v-if="
+                          avatarUrl.value.value !== null &&
+                          (previewAvatar || profile?.avatar_url)
+                        "
+                      >
+                        <VBtn
+                          append-icon="mdi-pencil"
+                          variant="plain"
+                          density="compact"
+                          slim
+                          @click="open()"
+                        >
+                          alterar
+                        </VBtn>
+                        <VBtn
+                          variant="plain"
+                          density="compact"
+                          slim
+                          color="error"
+                          append-icon="mdi-delete"
+                          @click="avatarUrl.setValue(null)"
+                        >
+                          remover
+                        </VBtn>
+                      </template>
+                      <VBtn v-else append-icon="mdi-pencil" @click="open()">
+                        Adicionar foto
+                      </VBtn>
+                    </VCol>
+                  </VRow>
+                  <VRow>
+                    <VDivider></VDivider>
+                    <VCol>
+                      <VListSubheader class="text-h6">
+                        Dados Pessoais
+                      </VListSubheader>
+                    </VCol>
+                  </VRow>
+                </template>
                 <VRow>
                   <VCol cols="12" sm="6">
                     <VTextField
@@ -102,6 +167,8 @@
                     <VTextarea
                       v-model="bio.value.value"
                       :error-messages="bio.errors.value"
+                      auto-grow
+                      rows="2"
                       label="Bio"
                     />
                   </VCol>
@@ -118,6 +185,31 @@
             </VMainCard>
           </VForm>
         </VCol>
+        <VCol sm="12" md="10" lg="5" xl="6" xxl="4">
+          <VMainCard>
+            <template #title>
+              <span class="text-h4">Adicionar contato</span>
+            </template>
+            <template #text>
+              <FormContacts />
+              <VDivider></VDivider>
+              <VList>
+                <VListSubheader>Contatos</VListSubheader>
+                <FormContactItem
+                  v-for="contact in profile?.contacts"
+                  :key="contact.id"
+                  :contact="contact"
+                />
+              </VList>
+              <p
+                v-if="profile?.contacts?.length === 0"
+                class="text-caption text-center pt-2"
+              >
+                Nenhum contato cadastrado.
+              </p>
+            </template>
+          </VMainCard>
+        </VCol>
       </VRow>
     </VContainer>
   </VMain>
@@ -127,13 +219,10 @@
 const authStore = useAuthStore()
 const postStore = usePostStore()
 const { locations } = storeToRefs(postStore)
-const { profile, user } = storeToRefs(authStore)
+const { profile } = storeToRefs(authStore)
 
 const { status } = postStore.fetchLocations()
-await useAsyncData(
-  'profile',
-  async () => await authStore.fetchProfile(user.value?.id ?? ''),
-)
+await useAsyncData('profile', async () => await authStore.fetchProfile())
 
 const { file, open } = useFileSystemAccess({
   types: [

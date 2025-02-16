@@ -1,7 +1,10 @@
 type DatabaseTables = Database['public']['Tables']
 
+export type ContactsRow = DatabaseTables['contacts']['Row']
+
 export type ProfilesRow = DatabaseTables['profiles']['Row'] & {
   location: DatabaseTables['locations']['Row'] | null
+  contacts: ContactsRow[]
 }
 
 export type PostsRow = DatabaseTables['posts']['Row']

@@ -14,25 +14,22 @@ export type Database = {
           contact: string
           id: number
           label: string
-          postsId: number | null
           profile_id: string
-          type: string | null
+          type: string
         }
         Insert: {
           contact: string
           id?: number
           label: string
-          postsId?: number | null
           profile_id?: string
-          type?: string | null
+          type?: string
         }
         Update: {
           contact?: string
           id?: number
           label?: string
-          postsId?: number | null
           profile_id?: string
-          type?: string | null
+          type?: string
         }
         Relationships: [
           {
@@ -73,6 +70,7 @@ export type Database = {
           title: string
           updated_at: string
           uuid: string
+          title_content_keywords: string | null
         }
         Insert: {
           author_id?: string
@@ -269,7 +267,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      title_content_keywords: {
+        Args: {
+          "": unknown
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

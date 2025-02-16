@@ -1,3 +1,34 @@
+export const contactSchema = z
+  .object({
+    type: z.enum(['email', 'phone', 'whatsapp', 'other']),
+    label: z.string().nonempty(),
+    contact: z.string(),
+  })
+  .superRefine((value, ctx) => {
+    switch (value.type) {
+      case 'email':
+        if (!/.+@.+\..+/.test(value.contact)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'E-mail inválido',
+          })
+        }
+        break
+
+      case 'phone':
+      case 'other':
+        if (!/^\d{10,11}$/.test(value.contact)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Número de telefone inválido',
+          })
+        }
+        break
+    }
+  })
+
+export type Contact = Zod.input<typeof contactSchema>
+
 export const editProfileSchema = z.object({
   username: z
     .string()
