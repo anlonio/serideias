@@ -111,8 +111,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     if (result.data) {
-      console.log(result.data)
-
       const publicUrl = await supabase.storage
         .from('avatar')
         .getPublicUrl(result.data.path)

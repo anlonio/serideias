@@ -31,10 +31,18 @@
               <br />
               <span class="text-caption font-weight-bold">Palavras-chave:</span>
               <VChipGroup>
-                <VChip v-if="post.location" prepend-icon="mdi-map-marker">
+                <VChip
+                  v-if="post.location"
+                  prepend-icon="mdi-map-marker"
+                  @click.stop="filterLocation"
+                >
                   {{ post.location.name }}
                 </VChip>
-                <VChip v-for="keyword in post.keywords" :key="keyword">
+                <VChip
+                  v-for="keyword in post.keywords"
+                  :key="keyword"
+                  @click.stop="searchKeyword(keyword)"
+                >
                   {{ keyword }}
                 </VChip>
               </VChipGroup>
@@ -107,8 +115,31 @@ const { onSubmit, loading } = useReplyForm(post.value?.id ?? 0)
 
 const replyContent = useField<string>('content')
 
-post.value = null
+post.value = undefined
 postStore.fetchPost()
+
+const router = useRouter()
+const route = useRoute()
+
+const searchKeyword = (keyword: string) => {
+  router.push({
+    path: '/',
+    query: {
+      ...route.query,
+      search: keyword,
+    },
+  })
+}
+
+const filterLocation = () => {
+  router.push({
+    path: '/',
+    query: {
+      ...route.query,
+      location: post.value?.location?.uuid,
+    },
+  })
+}
 </script>
 
 <style></style>

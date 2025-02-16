@@ -98,10 +98,7 @@ watch(
 )
 
 const setNavigationDrawer = () => {
-  console.log(display.name.value)
   if (display.mdAndDown.value) {
-    console.log('aq')
-
     drawerToggle.value = !drawerToggle.value
     return
   }

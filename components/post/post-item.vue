@@ -54,10 +54,17 @@
       <VContainer>
         <VRow>
           <VChipGroup>
-            <VChip v-if="post.location" prepend-icon="mdi-map-marker">{{
-              post.location.name
-            }}</VChip>
-            <VChip v-for="keyword in post.keywords" :key="keyword">
+            <VChip
+              v-if="post.location"
+              prepend-icon="mdi-map-marker"
+              @click.stop="filterLocation"
+              >{{ post.location.name }}</VChip
+            >
+            <VChip
+              v-for="keyword in post.keywords"
+              :key="keyword"
+              @click.stop="searchKeyword(keyword)"
+            >
               {{ keyword }}
             </VChip>
           </VChipGroup>
@@ -110,6 +117,29 @@ const getVotesIcon = computed(() => {
 })
 
 const createdAt = useDate().format(post.created_at, 'keyboardDateTime')
+
+const router = useRouter()
+const route = useRoute()
+
+const searchKeyword = (keyword: string) => {
+  router.push({
+    path: '/',
+    query: {
+      ...route.query,
+      search: keyword,
+    },
+  })
+}
+
+const filterLocation = () => {
+  router.push({
+    path: '/',
+    query: {
+      ...route.query,
+      location: post.location?.uuid,
+    },
+  })
+}
 </script>
 
 <style></style>

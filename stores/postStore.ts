@@ -5,7 +5,7 @@ export const usePostStore = defineStore('post', () => {
   const { user } = storeToRefs(authStore)
 
   const posts = ref<PostsRowFull[]>([])
-  const post = ref<PostsRowFullWithReplies | null>(null)
+  const post = ref<PostsRowFullWithReplies>()
   const locationsWithPosts = ref<LocationsRowWithPosts[]>([])
 
   const rootReplies = computed(() => {
@@ -30,23 +30,31 @@ export const usePostStore = defineStore('post', () => {
   }
 
   const fetchPosts = async ({ nextPage }: { nextPage?: boolean } = {}) => {
+    let filter = `
+        *,
+        author:profiles(
+          *,
+          contacts(*),
+          location: locations(*)
+          ),
+        totalReplies:replies(count),
+        location:locations(*),
+        upVotes:votes(count),
+        downVotes:votes(count),
+        myVote:votes(*)
+        `
+    const route = useRoute()
+
+    if (route.query.location) {
+      filter = filter.replace(
+        'location:locations(*),',
+        'location:locations!inner(*),',
+      )
+    }
+
     let queryBuilder = supabase
       .from('posts')
-      .select(
-        `
-          *,
-          author:profiles(
-            *,
-            location: locations(*),
-            contacts(*)
-            ),
-          totalReplies:replies(count),
-          location:locations(*),
-          upVotes:votes(count),
-          downVotes:votes(count),
-          myVote:votes(*)
-          `,
-      )
+      .select(filter)
       .eq('upVotes.is_upvote', true)
       .eq('downVotes.is_upvote', false)
 
@@ -56,16 +64,20 @@ export const usePostStore = defineStore('post', () => {
       queryBuilder = queryBuilder.is('myVote.author_id', null)
     }
 
-    const route = useRoute()
-
     if (route.query.search) {
       queryBuilder = queryBuilder.textSearch(
         'title_content_keywords',
-        route.query.search?.toString(),
+        route.query.search.toString(),
         {
           type: 'websearch',
         },
       )
+    }
+
+    if (route.query.location) {
+      const locationUuid = route.query.location.toString()
+
+      queryBuilder = queryBuilder.eq('locations.uuid', locationUuid)
     }
 
     if (route.name?.toString().startsWith('MyPosts')) {
@@ -295,15 +307,10 @@ export const usePostStore = defineStore('post', () => {
 
   const locations = ref<LocationsRow[]>([])
 
-  const fetchLocations = () => {
-    return useAsyncData('locations', async () => {
-      const { data } = await supabase
-        .from('locations')
-        .select('*')
-        .order('name')
-      locations.value = data ?? []
-      return data ?? []
-    })
+  const fetchLocations = async () => {
+    const { data } = await supabase.from('locations').select('*').order('name')
+    locations.value = data ?? []
+    return data ?? []
   }
 
   return {

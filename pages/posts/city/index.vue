@@ -28,7 +28,10 @@
                 sm="6"
                 lg="4"
               >
-                <VMainCard :title="location.name">
+                <VMainCard
+                  :title="location.name"
+                  :to="{ path: '/', query: { location: location.uuid } }"
+                >
                   <template #append>
                     <VBadge bordered color="grey" class="pr-4">
                       <template #badge>{{ location.posts[0].count }}</template>
