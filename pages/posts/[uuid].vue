@@ -77,7 +77,7 @@
                       variant="plain"
                       density="compact"
                       :ripple="false"
-                      @click="replyForm?.requestSubmit()"
+                      @click="replyTest"
                     />
                   </template>
                 </VTextarea>
@@ -111,13 +111,15 @@ const { post, rootReplies } = storeToRefs(postStore)
 
 const replyForm = useTemplateRef('replyForm')
 
+const replyTest = () => {
+  console.log(replyForm.value?.requestSubmit)
+  replyForm.value?.requestSubmit()
+}
+
+await useAsyncData('post', async () => await postStore.fetchPost())
+
 const { onSubmit, loading } = useReplyForm(post.value?.id ?? 0)
-
 const replyContent = useField<string>('content')
-
-post.value = undefined
-postStore.fetchPost()
-
 const router = useRouter()
 const route = useRoute()
 

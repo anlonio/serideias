@@ -133,6 +133,7 @@ export const usePostStore = defineStore('post', () => {
       })
 
   const fetchPost = () => {
+    post.value = undefined
     const route = useRoute()
     const uuid = route.params.uuid.toString()
 
@@ -241,6 +242,14 @@ export const usePostStore = defineStore('post', () => {
     return supabase.from('posts').insert(post).select().maybeSingle()
   }
 
+  const deletePost = (id: number) => {
+    return supabase.from('posts').delete().eq('id', id)
+  }
+
+  const deleteReply = (id: number) => {
+    return supabase.from('replies').delete().eq('id', id)
+  }
+
   const replyPost = async (
     content: string,
     post_id: number,
@@ -323,6 +332,8 @@ export const usePostStore = defineStore('post', () => {
     fetchVotes,
     fetchLocations,
     createPost,
+    deletePost,
+    deleteReply,
     replyPost,
     saveVote,
     locations,

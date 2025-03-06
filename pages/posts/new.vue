@@ -15,12 +15,14 @@
               </VCol>
             </VRow>
             <VRow>
-              <ClientOnly>
-                <VuetifyTiptap
-                  v-model="content.value.value"
-                  markdown-theme="github"
-                ></VuetifyTiptap>
-              </ClientOnly>
+              <VCol>
+                <ClientOnly>
+                  <VuetifyTiptap
+                    v-model="content.value.value"
+                    markdown-theme="github"
+                  ></VuetifyTiptap>
+                </ClientOnly>
+              </VCol>
             </VRow>
             <VRow>
               <VCol>

@@ -53,7 +53,7 @@
 <script lang="ts" setup>
 const authStore = useAuthStore()
 
-const { handleSubmit } = useForm({
+const { handleSubmit, resetForm } = useForm({
   validationSchema: toTypedSchema(contactSchema),
 })
 
@@ -73,6 +73,7 @@ const onSubmit = handleSubmit(async (data) => {
       return
     }
     await authStore.fetchProfile()
+    resetForm()
     snackbar.add({
       title: 'Show',
       text: 'Contato adicionado com sucesso',

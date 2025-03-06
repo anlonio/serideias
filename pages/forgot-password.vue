@@ -18,7 +18,9 @@
                   </VCol>
                 </VRow>
                 <VRow class="pt-4">
-                  <VBtn class="mr-4" variant="text">Fazer login</VBtn>
+                  <VBtn class="mr-4" variant="text" to="/login">
+                    Fazer login
+                  </VBtn>
                   <VSpacer />
                   <VBtn color="success" type="submit" :loading="loading">
                     Solicitar e-mail

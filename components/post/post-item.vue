@@ -35,7 +35,11 @@
             <VBtn variant="text" color="error" @click="deleteDialog = false"
               >Cancelar</VBtn
             >
-            <VBtn variant="text" color="success" @click="deleteDialog = false"
+            <VBtn
+              variant="text"
+              color="success"
+              :loading="deleteLoading"
+              @click="deletePost"
               >Confirmar</VBtn
             >
           </template>
@@ -104,6 +108,7 @@
 import { useDate } from 'vuetify'
 
 const authStore = useAuthStore()
+const postStore = usePostStore()
 const { profile } = storeToRefs(authStore)
 
 const { post } = defineProps<{ post: PostsRowFull }>()
@@ -111,6 +116,18 @@ const { post } = defineProps<{ post: PostsRowFull }>()
 const totalVotes = computed(() => post.upVotes - post.downVotes)
 
 const deleteDialog = ref(false)
+const deleteLoading = ref(false)
+
+const deletePost = async () => {
+  deleteLoading.value = true
+  const { error } = await postStore.deletePost(post.id)
+  deleteLoading.value = false
+  postStore.fetchPosts()
+  if (error) {
+    console.error(error)
+  }
+  deleteDialog.value = false
+}
 
 const getVotesIcon = computed(() => {
   return totalVotes.value >= 0 ? 'mdi-arrow-up-bold' : 'mdi-arrow-down-bold'

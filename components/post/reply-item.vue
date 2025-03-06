@@ -30,7 +30,7 @@
                 <VDialog v-model="deleteDialog" width="240px">
                   <VMainCard variant="flat">
                     <template #title>
-                      <div class="text-center">Apagar publicação?</div>
+                      <div class="text-center">Apagar resposta?</div>
                     </template>
                     <template #actions>
                       <VBtn
@@ -42,7 +42,8 @@
                       <VBtn
                         variant="text"
                         color="success"
-                        @click="deleteDialog = false"
+                        :loading="deleteLoading"
+                        @click="deleteReply"
                         >Confirmar</VBtn
                       >
                     </template>
@@ -130,6 +131,18 @@ const { nestedReplies } = storeToRefs(postStore)
 const { profile } = storeToRefs(authStore)
 
 const deleteDialog = ref(false)
+const deleteLoading = ref(false)
+
+const deleteReply = async () => {
+  deleteLoading.value = true
+  const { error } = await postStore.deleteReply(reply.id)
+  deleteLoading.value = false
+  postStore.fetchPost()
+  if (error) {
+    console.error(error)
+  }
+  deleteDialog.value = false
+}
 
 const replyForm = useTemplateRef('replyForm')
 const { onSubmit, loading, errors } = useReplyForm(

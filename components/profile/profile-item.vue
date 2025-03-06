@@ -2,7 +2,7 @@
   <VMenu
     open-on-hover
     :open-on-click="$vuetify.display.platform.touch"
-    class="w-auto"
+    min-width="420px"
   >
     <template #activator="{ props }">
       <VListItem
