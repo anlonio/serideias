@@ -291,6 +291,7 @@ const onSubmit = handleSubmit(async (profile) => {
       return
     }
 
+    await authStore.fetchProfile()
     snackbar.add({
       text: 'Perfil atualizado com sucesso',
       type: 'success',
